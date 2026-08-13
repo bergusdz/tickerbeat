@@ -82,6 +82,12 @@
   padding: 16px;
   border: 1px solid #34372f;
   background: #10120e;
+  transition: border-color 140ms ease, box-shadow 140ms ease;
+}
+
+.grid article[data-playing="true"] {
+  border-color: var(--acid);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acid), transparent 72%);
 }
 
 .grid img,
