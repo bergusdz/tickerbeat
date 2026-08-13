@@ -1,0 +1,55 @@
+:root {
+  --ink: #070806;
+  --machine: #11130f;
+  --panel: #171a15;
+  --paper: #f4f1e8;
+  --muted: #8d9385;
+  --line: rgba(244, 241, 232, 0.12);
+  --line-strong: #353a30;
+  --acid: #d2ff37;
+  --signal: #ff573d;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  font-family: var(--font-mono), monospace;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+::selection {
+  background: var(--acid);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

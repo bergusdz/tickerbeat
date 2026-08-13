@@ -2,6 +2,7 @@ node_modules/
 .next/
 dist/
 coverage/
+artifacts/
 out/
 cache/
 broadcast/
@@ -9,5 +10,8 @@ broadcast/
 .env.*
 !.env.example
 *.log
+*.tsbuildinfo
 .DS_Store
 
+.vercel
+.worktrees/

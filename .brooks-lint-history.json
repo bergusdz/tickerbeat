@@ -1,0 +1,13 @@
+[
+  {
+    "date": "2026-08-13",
+    "mode": "Architecture Audit",
+    "score": 48,
+    "findings": {
+      "critical": 2,
+      "warning": 4,
+      "suggestion": 2
+    },
+    "scope": "entire src directory"
+  }
+]
