@@ -1,11 +1,10 @@
-import type { Step, StudioProject, Track, TrackId } from "./model";
+import { createDemoProject, type Step, type StudioProject, type Track, type TrackId } from "./model";
 
-export const PROJECT_STORAGE_KEY = "tickerbeat.project.v1";
+export const PROJECT_STORAGE_KEY = "tickerbeat.project.v2";
+export const LEGACY_PROJECT_STORAGE_KEY = "tickerbeat.project.v1";
 
-type StoredProject = {
-  version: 1;
-  project: StudioProject;
-};
+type LegacyTrack = Omit<Track, "instrument" | "filter" | "echo">;
+type LegacyProject = Omit<StudioProject, "tracks"> & { tracks: LegacyTrack[] };
 
 const TRACK_IDS = new Set<TrackId>(["drums", "bass", "chords", "lead"]);
 
@@ -23,9 +22,8 @@ function isStep(value: unknown): value is Step {
   );
 }
 
-function isTrack(value: unknown): value is Track {
+function isLegacyTrack(value: unknown): value is LegacyTrack {
   if (!isRecord(value) || !TRACK_IDS.has(value.id as TrackId)) return false;
-
   const validNote =
     typeof value.note === "string" ||
     (Array.isArray(value.note) && value.note.length > 0 && value.note.every((note) => typeof note === "string"));
@@ -45,10 +43,28 @@ function isTrack(value: unknown): value is Track {
   );
 }
 
-function isStudioProject(value: unknown): value is StudioProject {
-  if (!isRecord(value) || !Array.isArray(value.tracks) || value.tracks.length !== 4) return false;
+function isTrack(value: unknown): value is Track {
+  if (!isLegacyTrack(value)) return false;
+  const candidate = value as LegacyTrack & Record<string, unknown>;
+  return (
+    Number.isInteger(candidate.instrument) &&
+    Number(candidate.instrument) >= 0 &&
+    Number(candidate.instrument) <= 2 &&
+    typeof candidate.filter === "number" &&
+    candidate.filter >= 0 &&
+    candidate.filter <= 1 &&
+    typeof candidate.echo === "number" &&
+    candidate.echo >= 0 &&
+    candidate.echo <= 1
+  );
+}
 
-  const ids = new Set(value.tracks.filter(isTrack).map((track) => track.id));
+function isProjectShape(
+  value: unknown,
+  trackGuard: (track: unknown) => boolean,
+): value is LegacyProject | StudioProject {
+  if (!isRecord(value) || !Array.isArray(value.tracks) || value.tracks.length !== 4) return false;
+  const ids = new Set(value.tracks.filter(trackGuard).map((track) => (track as LegacyTrack).id));
   return (
     typeof value.title === "string" &&
     value.title.length > 0 &&
@@ -59,14 +75,29 @@ function isStudioProject(value: unknown): value is StudioProject {
     typeof value.swing === "number" &&
     value.swing >= 0 &&
     value.swing <= 0.45 &&
-    value.tracks.every(isTrack) &&
+    value.tracks.every(trackGuard) &&
     ids.size === TRACK_IDS.size
   );
 }
 
+function migrateLegacyProject(project: LegacyProject): StudioProject {
+  const defaults = new Map(createDemoProject().tracks.map((track) => [track.id, track]));
+  return {
+    ...project,
+    tracks: project.tracks.map((track) => {
+      const fallback = defaults.get(track.id)!;
+      return {
+        ...track,
+        instrument: fallback.instrument,
+        filter: fallback.filter,
+        echo: fallback.echo,
+      };
+    }),
+  };
+}
+
 export function serializeProject(project: StudioProject): string {
-  const stored: StoredProject = { version: 1, project };
-  return JSON.stringify(stored);
+  return JSON.stringify({ version: 2, project });
 }
 
 export function parseStoredProject(raw: string | null): StudioProject | null {
@@ -74,8 +105,14 @@ export function parseStoredProject(raw: string | null): StudioProject | null {
 
   try {
     const stored: unknown = JSON.parse(raw);
-    if (!isRecord(stored) || stored.version !== 1 || !isStudioProject(stored.project)) return null;
-    return stored.project;
+    if (!isRecord(stored)) return null;
+    if (stored.version === 2 && isProjectShape(stored.project, isTrack)) {
+      return stored.project as StudioProject;
+    }
+    if (stored.version === 1 && isProjectShape(stored.project, isLegacyTrack)) {
+      return migrateLegacyProject(stored.project as LegacyProject);
+    }
+    return null;
   } catch {
     return null;
   }

@@ -1,4 +1,5 @@
 export type TrackId = "drums" | "bass" | "chords" | "lead";
+export type InstrumentPreset = 0 | 1 | 2;
 
 export type Step = {
   active: boolean;
@@ -10,6 +11,9 @@ export type Track = {
   label: string;
   color: string;
   note: string | string[];
+  instrument: InstrumentPreset;
+  filter: number;
+  echo: number;
   volume: number;
   muted: boolean;
   solo: boolean;
@@ -45,6 +49,9 @@ export function createDemoProject(): StudioProject {
         label: "Drums",
         color: "#d9ff43",
         note: "C1",
+        instrument: 0,
+        filter: 0.86,
+        echo: 0.06,
         volume: -4,
         muted: false,
         solo: false,
@@ -55,6 +62,9 @@ export function createDemoProject(): StudioProject {
         label: "Bass",
         color: "#ff5a36",
         note: "F2",
+        instrument: 0,
+        filter: 0.46,
+        echo: 0.14,
         volume: -7,
         muted: false,
         solo: false,
@@ -65,6 +75,9 @@ export function createDemoProject(): StudioProject {
         label: "Chords",
         color: "#69d7ff",
         note: ["F3", "Ab3", "C4"],
+        instrument: 0,
+        filter: 0.68,
+        echo: 0.28,
         volume: -12,
         muted: false,
         solo: false,
@@ -75,6 +88,9 @@ export function createDemoProject(): StudioProject {
         label: "Lead",
         color: "#f4c95d",
         note: "C5",
+        instrument: 0,
+        filter: 0.74,
+        echo: 0.22,
         volume: -13,
         muted: false,
         solo: false,

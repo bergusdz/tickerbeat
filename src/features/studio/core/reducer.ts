@@ -1,4 +1,4 @@
-import type { StudioProject, Track, TrackId } from "./model";
+import type { InstrumentPreset, StudioProject, Track, TrackId } from "./model";
 
 export type ProjectAction =
   | { type: "set-title"; value: string }
@@ -6,6 +6,9 @@ export type ProjectAction =
   | { type: "set-tempo"; value: number }
   | { type: "set-swing"; value: number }
   | { type: "set-volume"; trackId: TrackId; value: number }
+  | { type: "set-instrument"; trackId: TrackId; value: number }
+  | { type: "set-filter"; trackId: TrackId; value: number }
+  | { type: "set-echo"; trackId: TrackId; value: number }
   | { type: "toggle-mute"; trackId: TrackId }
   | { type: "toggle-solo"; trackId: TrackId }
   | { type: "clear-track"; trackId: TrackId };
@@ -62,6 +65,26 @@ export function reduceProject(project: StudioProject, action: ProjectAction): St
       return updateTrack(project, action.trackId, (track) => {
         const volume = clamp(action.value, -36, 6);
         return volume === track.volume ? track : { ...track, volume };
+      });
+
+    case "set-instrument":
+      if (!Number.isInteger(action.value) || action.value < 0 || action.value > 2) return project;
+      return updateTrack(project, action.trackId, (track) =>
+        track.instrument === action.value
+          ? track
+          : { ...track, instrument: action.value as InstrumentPreset },
+      );
+
+    case "set-filter":
+      return updateTrack(project, action.trackId, (track) => {
+        const filter = clamp(action.value, 0, 1);
+        return filter === track.filter ? track : { ...track, filter };
+      });
+
+    case "set-echo":
+      return updateTrack(project, action.trackId, (track) => {
+        const echo = clamp(action.value, 0, 1);
+        return echo === track.echo ? track : { ...track, echo };
       });
 
     case "toggle-mute":

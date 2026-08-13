@@ -69,4 +69,17 @@ describe("reduceProject", () => {
     expect(next.tracks[0].volume).toBe(-9);
     expect(next.tracks[0].muted).toBe(true);
   });
+
+  it("changes one channel instrument and clamps its FX controls", () => {
+    const project = createDemoProject();
+    const voiced = reduceProject(project, { type: "set-instrument", trackId: "bass", value: 2 });
+    const filtered = reduceProject(voiced, { type: "set-filter", trackId: "bass", value: -1 });
+    const echoed = reduceProject(filtered, { type: "set-echo", trackId: "bass", value: 4 });
+
+    expect(voiced.tracks[1].instrument).toBe(2);
+    expect(filtered.tracks[1].filter).toBe(0);
+    expect(echoed.tracks[1].echo).toBe(1);
+    expect(echoed.tracks[0]).toEqual(project.tracks[0]);
+    expect(reduceProject(project, { type: "set-instrument", trackId: "bass", value: 7 })).toBe(project);
+  });
 });

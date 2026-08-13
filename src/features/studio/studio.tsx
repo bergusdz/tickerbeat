@@ -6,6 +6,7 @@ import { commit, createHistory, redo, undo, type ProjectHistory } from "./core/h
 import { createDemoProject, type Track, type TrackId } from "./core/model";
 import {
   parseStoredProject,
+  LEGACY_PROJECT_STORAGE_KEY,
   PROJECT_STORAGE_KEY,
   serializeProject,
 } from "./core/project-storage";
@@ -125,7 +126,9 @@ export function Studio() {
   const edit = (action: ProjectAction) => dispatch({ type: "edit", action });
 
   useEffect(() => {
-    const stored = parseStoredProject(localStorage.getItem(PROJECT_STORAGE_KEY));
+    const stored = parseStoredProject(
+      localStorage.getItem(PROJECT_STORAGE_KEY) ?? localStorage.getItem(LEGACY_PROJECT_STORAGE_KEY),
+    );
     queueMicrotask(() => {
       if (stored) dispatch({ type: "restore", project: stored });
       draftRestored.current = true;
