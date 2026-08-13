@@ -19,11 +19,16 @@ import type { PublicationReceipt, PublishableArtifact } from "@/features/publica
 import { getBaseWalletAfterSwitch } from "./base-wallet";
 import { createClankerTokenConfig } from "./clanker-config";
 import { assertClankerLaunchReceipt } from "./launch-receipt";
-import { assertReviewedLaunch } from "./launch-review";
+import { assertReviewedLaunch, createLaunchReview } from "./launch-review";
 
 type LaunchState =
   | { status: "idle" | "simulating" }
-  | { status: "ready" | "launching"; expectedAddress: `0x${string}`; reviewedConfig: string }
+  | {
+      status: "ready" | "launching";
+      expectedAddress: `0x${string}`;
+      reviewedConfig: string;
+      valueWei: bigint;
+    }
   | { status: "error"; message: string }
   | { status: "submitted"; txHash: `0x${string}` }
   | { status: "confirmed"; txHash: `0x${string}`; tokenAddress: `0x${string}` };
@@ -95,6 +100,7 @@ export function LaunchPanel({
         status: "ready",
         expectedAddress: transaction.expectedAddress,
         reviewedConfig: currentConfig,
+        valueWei: transaction.value ?? BigInt(0),
       });
     } catch (error) {
       setLaunch({ status: "error", message: error instanceof Error ? error.message : "Simulation failed." });
@@ -116,6 +122,7 @@ export function LaunchPanel({
         status: "launching",
         expectedAddress,
         reviewedConfig: launch.reviewedConfig,
+        valueWei: launch.valueWei,
       });
       const suffix = deploymentSuffix();
       const client = clanker(await freshBaseWallet());
@@ -139,6 +146,16 @@ export function LaunchPanel({
       setLaunch({ status: "error", message: error instanceof Error ? error.message : "Launch failed." });
     }
   };
+
+  const review =
+    receipt && connection.address && (launch.status === "ready" || launch.status === "launching")
+      ? createLaunchReview({
+          creator: connection.address,
+          expectedAddress: launch.expectedAddress,
+          metadataUri: receipt.metadataUri,
+          valueWei: launch.valueWei,
+        })
+      : null;
 
   return (
     <div className={styles.releaseStage}>
@@ -174,8 +191,15 @@ export function LaunchPanel({
             </div>
           ) : (
             <>
-              {launch.status === "ready" || launch.status === "launching" ? (
-                <p>PREDICTED TOKEN: {shortAddress(launch.expectedAddress)}</p>
+              {review ? (
+                <dl className={styles.launchReview}>
+                  <div><dt>PROTOCOL</dt><dd>{review.protocol}</dd></div>
+                  <div><dt>NETWORK</dt><dd>{review.network} / {review.chainId}</dd></div>
+                  <div><dt>CREATOR</dt><dd title={review.creator}>{shortAddress(review.creator)}</dd></div>
+                  <div><dt>METADATA</dt><dd title={review.metadataUri}>IPFS / IMMUTABLE</dd></div>
+                  <div><dt>PREDICTED TOKEN</dt><dd title={review.expectedAddress}>{shortAddress(review.expectedAddress)}</dd></div>
+                  <div><dt>TX VALUE</dt><dd>{review.valueEth}</dd></div>
+                </dl>
               ) : null}
               <button
                 type="button"

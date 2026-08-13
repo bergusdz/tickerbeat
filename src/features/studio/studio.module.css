@@ -628,6 +628,37 @@
   display: grid;
 }
 
+.launchReview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 2px 0;
+  border: 1px solid #353a2f;
+  background: #353a2f;
+}
+
+.launchReview div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 9px;
+  background: #0f120c;
+}
+
+.launchReview dt {
+  color: #6f7468;
+  font-size: 7px;
+}
+
+.launchReview dd {
+  overflow: hidden;
+  margin: 0;
+  color: var(--paper);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .releaseStage .launchConfirm {
   border-color: var(--acid);
   background: var(--acid);
