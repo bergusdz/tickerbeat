@@ -18,10 +18,11 @@ import type { PublicationReceipt, PublishableArtifact } from "@/features/publica
 
 import { getBaseWalletAfterSwitch } from "./base-wallet";
 import { createClankerTokenConfig } from "./clanker-config";
+import { assertReviewedLaunch } from "./launch-review";
 
 type LaunchState =
   | { status: "idle" | "simulating" }
-  | { status: "ready" | "launching"; expectedAddress: `0x${string}` }
+  | { status: "ready" | "launching"; expectedAddress: `0x${string}`; reviewedConfig: string }
   | { status: "error"; message: string }
   | { status: "submitted"; txHash: `0x${string}` }
   | { status: "confirmed"; txHash: `0x${string}`; tokenAddress: `0x${string}` };
@@ -60,6 +61,7 @@ export function LaunchPanel({
         metadataUri: receipt.metadataUri,
       })
     : null;
+  const currentConfig = tokenConfig ? JSON.stringify(tokenConfig) : "";
 
   const clanker = (wallet: WalletClient<Transport, Chain, Account>) => {
     if (!publicClient) throw new Error("Base public client is not ready.");
@@ -88,7 +90,11 @@ export function LaunchPanel({
       if (!transaction.expectedAddress) throw new Error("Clanker did not return a predicted token address.");
       const result = await client.deploySimulate(tokenConfig);
       if ("error" in result && result.error) throw result.error;
-      setLaunch({ status: "ready", expectedAddress: transaction.expectedAddress });
+      setLaunch({
+        status: "ready",
+        expectedAddress: transaction.expectedAddress,
+        reviewedConfig: currentConfig,
+      });
     } catch (error) {
       setLaunch({ status: "error", message: error instanceof Error ? error.message : "Simulation failed." });
     }
@@ -96,9 +102,17 @@ export function LaunchPanel({
 
   const deploy = async () => {
     if (!tokenConfig || launch.status !== "ready") return;
-    const expectedAddress = launch.expectedAddress;
-    setLaunch({ status: "launching", expectedAddress });
     try {
+      const expectedAddress = assertReviewedLaunch(
+        launch.reviewedConfig,
+        currentConfig,
+        launch.expectedAddress,
+      );
+      setLaunch({
+        status: "launching",
+        expectedAddress,
+        reviewedConfig: launch.reviewedConfig,
+      });
       const suffix = deploymentSuffix();
       const client = clanker(await freshBaseWallet());
       const result = await client.deploy(tokenConfig, suffix ? { dataSuffix: suffix } : undefined);

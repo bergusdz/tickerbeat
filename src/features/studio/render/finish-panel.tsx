@@ -38,7 +38,13 @@ export function FinishPanel({
   const [status, setStatus] = useState<"idle" | "rendering" | "ready" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
   const [artifact, setArtifact] = useState<FinishedArtifact | null>(null);
+  const [artifactSource, setArtifactSource] = useState<{
+    project: StudioProject;
+    clip: SoundClip | null;
+  } | null>(null);
   const filename = useMemo(() => symbolFromTitle(title).toLowerCase(), [title]);
+  const currentArtifact =
+    artifactSource?.project === project && artifactSource.clip === clip ? artifact : null;
 
   useEffect(() => () => revokeArtifact(artifact), [artifact]);
 
@@ -47,6 +53,7 @@ export function FinishPanel({
     setError(null);
     revokeArtifact(artifact);
     setArtifact(null);
+    setArtifactSource(null);
 
     try {
       const finalized = { ...project, title: title.trim() || project.title };
@@ -67,7 +74,7 @@ export function FinishPanel({
         coverUrl: URL.createObjectURL(cover),
         projectUrl: URL.createObjectURL(projectFile),
       });
-      onTitleChange(finalized.title);
+      setArtifactSource({ project, clip });
       setStatus("ready");
     } catch (renderError) {
       setError(renderError instanceof Error ? renderError.message : "The sound could not be rendered.");
@@ -92,7 +99,14 @@ export function FinishPanel({
             aria-label="Track title"
             maxLength={80}
             value={title}
-            onChange={(event) => setTitle(event.target.value)}
+            onChange={(event) => {
+              revokeArtifact(artifact);
+              setArtifact(null);
+              setArtifactSource(null);
+              setStatus("idle");
+              setTitle(event.target.value);
+              onTitleChange(event.target.value);
+            }}
           />
         </label>
         <label>
@@ -101,7 +115,13 @@ export function FinishPanel({
             aria-label="Token ticker"
             maxLength={10}
             value={symbol}
-            onChange={(event) => setSymbol(symbolFromTitle(event.target.value))}
+            onChange={(event) => {
+              revokeArtifact(artifact);
+              setArtifact(null);
+              setArtifactSource(null);
+              setStatus("idle");
+              setSymbol(symbolFromTitle(event.target.value));
+            }}
           />
         </label>
         <button
@@ -116,28 +136,30 @@ export function FinishPanel({
 
       {error ? <p className={styles.renderError}>{error}</p> : null}
 
-      {artifact ? (
+      {currentArtifact ? (
         <div className={styles.artifactPanel} role="status">
-          <audio aria-label="Finished track preview" controls src={artifact.audioUrl} />
+          <audio aria-label="Finished track preview" controls src={currentArtifact.audioUrl} />
           <div>
             <strong>MASTER READY</strong>
             <span>{symbol} / WAV + SVG + PROJECT STATE</span>
           </div>
           <nav aria-label="Finished track downloads">
-            <a href={artifact.audioUrl} download={`${filename}.wav`}>WAV</a>
-            <a href={artifact.coverUrl} download={`${filename}-cover.svg`}>COVER</a>
-            <a href={artifact.projectUrl} download={`${filename}.tickerbeat.json`}>PROJECT</a>
+            <a href={currentArtifact.audioUrl} download={`${filename}.wav`}>WAV</a>
+            <a href={currentArtifact.coverUrl} download={`${filename}-cover.svg`}>COVER</a>
+            <a href={currentArtifact.projectUrl} download={`${filename}.tickerbeat.json`}>PROJECT</a>
           </nav>
         </div>
       ) : null}
 
       <div className={styles.launchGate}>
         <span>BASE LAUNCH</span>
-        <strong>{artifact ? "ARTIFACT VERIFIED LOCALLY" : "WAITING FOR MASTER"}</strong>
+        <strong>{currentArtifact ? "ARTIFACT VERIFIED LOCALLY" : "WAITING FOR MASTER"}</strong>
         <small>IPFS publication happens before any wallet or market action.</small>
       </div>
 
-      {artifact ? <PublishPanel artifact={artifact} /> : null}
+      {currentArtifact ? (
+        <PublishPanel key={currentArtifact.projectUrl} artifact={currentArtifact} />
+      ) : null}
     </section>
   );
 }
