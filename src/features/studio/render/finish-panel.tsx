@@ -6,7 +6,7 @@ import type { StudioProject } from "../core/model";
 import { serializeProject } from "../core/project-storage";
 import type { SoundClip } from "../recording/types";
 import styles from "../studio.module.css";
-import { PublishPanel } from "../../publication/publish-panel";
+import { ReleaseShell } from "../../release/release-shell";
 import type { PublishableArtifact } from "../../publication/types";
 import { decodeAudioBlob, renderProjectToWav } from "./render-project";
 import { createCoverSvg } from "./render-utils";
@@ -161,7 +161,7 @@ export function FinishPanel({
       </div>
 
       {currentArtifact ? (
-        <PublishPanel key={currentArtifact.projectUrl} artifact={currentArtifact} />
+        <ReleaseShell key={currentArtifact.projectUrl} artifact={currentArtifact} />
       ) : null}
     </section>
   );
