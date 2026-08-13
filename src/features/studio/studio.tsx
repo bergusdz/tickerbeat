@@ -1,15 +1,24 @@
 "use client";
 
-import { useReducer, useState, type CSSProperties } from "react";
+import { useEffect, useReducer, useRef, useState, type CSSProperties } from "react";
 
 import { commit, createHistory, redo, undo, type ProjectHistory } from "./core/history";
 import { createDemoProject, type Track, type TrackId } from "./core/model";
+import {
+  parseStoredProject,
+  PROJECT_STORAGE_KEY,
+  serializeProject,
+} from "./core/project-storage";
 import type { ProjectAction } from "./core/reducer";
 import styles from "./studio.module.css";
 import { useStudioAudio } from "./use-studio-audio";
+import { SoundClipPanel } from "./recording/sound-clip-panel";
+import { useSoundClip } from "./recording/use-sound-clip";
+import { FinishPanel } from "./render/finish-panel";
 
 type HistoryAction =
   | { type: "edit"; action: ProjectAction }
+  | { type: "restore"; project: ReturnType<typeof createDemoProject> }
   | { type: "undo" }
   | { type: "redo" };
 
@@ -17,6 +26,8 @@ function historyReducer(history: ProjectHistory, action: HistoryAction): Project
   switch (action.type) {
     case "edit":
       return commit(history, action.action);
+    case "restore":
+      return createHistory(action.project);
     case "undo":
       return undo(history);
     case "redo":
@@ -105,11 +116,28 @@ export function Studio() {
   );
   const [selectedTrack, setSelectedTrack] = useState<TrackId>("drums");
   const [finishOpen, setFinishOpen] = useState(false);
+  const draftRestored = useRef(false);
   const project = history.present;
   const { isPlaying, currentStep, togglePlayback } = useStudioAudio(project);
+  const soundClip = useSoundClip();
   const activeTrack = project.tracks.find((track) => track.id === selectedTrack) ?? project.tracks[0];
 
   const edit = (action: ProjectAction) => dispatch({ type: "edit", action });
+
+  useEffect(() => {
+    const stored = parseStoredProject(localStorage.getItem(PROJECT_STORAGE_KEY));
+    queueMicrotask(() => {
+      if (stored) dispatch({ type: "restore", project: stored });
+      draftRestored.current = true;
+      if (!stored) localStorage.setItem(PROJECT_STORAGE_KEY, serializeProject(project));
+    });
+    // The initial project is immutable for this one-time external-store hydration.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (draftRestored.current) localStorage.setItem(PROJECT_STORAGE_KEY, serializeProject(project));
+  }, [project]);
 
   return (
     <main className={styles.pageShell}>
@@ -234,10 +262,11 @@ export function Studio() {
         </div>
 
         {finishOpen ? (
-          <div className={styles.finishNotice} role="status">
-            <strong>THE LOOP IS READY.</strong>
-            <span>Audio render + Base launch connect in the next build slice.</span>
-          </div>
+          <FinishPanel
+            project={project}
+            clip={soundClip.clip}
+            onTitleChange={(title) => edit({ type: "set-title", value: title })}
+          />
         ) : null}
 
         <div className={styles.workbench}>
@@ -313,6 +342,7 @@ export function Studio() {
               <span>03</span>
               <strong>PERFORM</strong>
             </div>
+            <SoundClipPanel control={soundClip} />
             <div className={styles.pads}>
               {[0, 4, 8, 12].map((step, index) => (
                 <button

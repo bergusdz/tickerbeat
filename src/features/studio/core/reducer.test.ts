@@ -4,6 +4,14 @@ import { createDemoProject } from "./model";
 import { reduceProject } from "./reducer";
 
 describe("reduceProject", () => {
+  it("normalizes a project title", () => {
+    const project = createDemoProject();
+    const next = reduceProject(project, { type: "set-title", value: "  Night signal  " });
+
+    expect(next.title).toBe("Night signal");
+    expect(reduceProject(project, { type: "set-title", value: "   " })).toBe(project);
+  });
+
   it("toggles one step without mutating the previous project", () => {
     const project = createDemoProject();
     const previous = project.tracks[1].steps[2].active;

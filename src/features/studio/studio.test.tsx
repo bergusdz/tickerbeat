@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Studio } from "./studio";
+import { createDemoProject } from "./core/model";
+import { PROJECT_STORAGE_KEY, serializeProject } from "./core/project-storage";
 
 const audio = vi.hoisted(() => ({
   togglePlayback: vi.fn(),
@@ -44,6 +46,18 @@ describe("Studio", () => {
     });
 
     expect(screen.getByText("132", { selector: "output" })).toBeInTheDocument();
+  });
+
+  it("restores a valid local draft", async () => {
+    localStorage.setItem(
+      PROJECT_STORAGE_KEY,
+      serializeProject({ ...createDemoProject(), tempo: 142, title: "Saved pulse" }),
+    );
+
+    render(<Studio />);
+
+    expect(await screen.findByText("142", { selector: "output" })).toBeInTheDocument();
+    expect(await screen.findByText("SAVED PULSE")).toBeInTheDocument();
   });
 
   it("clears and restores the active track", () => {

@@ -1,0 +1,137 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+import type { StudioProject } from "../core/model";
+import type { SoundClip } from "../recording/use-sound-clip";
+import styles from "../studio.module.css";
+import { decodeAudioBlob, renderProjectToWav } from "./render-project";
+import { createCoverSvg } from "./render-utils";
+
+type FinishedArtifact = {
+  audioUrl: string;
+  coverUrl: string;
+  projectUrl: string;
+};
+
+export function symbolFromTitle(title: string): string {
+  const compact = title.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);
+  return compact || "BEAT";
+}
+
+function revokeArtifact(artifact: FinishedArtifact | null): void {
+  if (!artifact) return;
+  URL.revokeObjectURL(artifact.audioUrl);
+  URL.revokeObjectURL(artifact.coverUrl);
+  URL.revokeObjectURL(artifact.projectUrl);
+}
+
+export function FinishPanel({
+  project,
+  clip,
+  onTitleChange,
+}: {
+  project: StudioProject;
+  clip: SoundClip | null;
+  onTitleChange: (title: string) => void;
+}) {
+  const [title, setTitle] = useState(project.title);
+  const [symbol, setSymbol] = useState(() => symbolFromTitle(project.title));
+  const [status, setStatus] = useState<"idle" | "rendering" | "ready" | "error">("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [artifact, setArtifact] = useState<FinishedArtifact | null>(null);
+  const filename = useMemo(() => symbolFromTitle(title).toLowerCase(), [title]);
+
+  useEffect(() => () => revokeArtifact(artifact), [artifact]);
+
+  const renderSound = async () => {
+    setStatus("rendering");
+    setError(null);
+    revokeArtifact(artifact);
+    setArtifact(null);
+
+    try {
+      const finalized = { ...project, title: title.trim() || project.title };
+      const decodedClip = clip ? await decodeAudioBlob(clip.blob) : undefined;
+      const audio = await renderProjectToWav(finalized, decodedClip);
+      const cover = createCoverSvg(finalized);
+      const projectFile = new Blob([JSON.stringify({ version: 1, project: finalized }, null, 2)], {
+        type: "application/json",
+      });
+      setArtifact({
+        audioUrl: URL.createObjectURL(audio),
+        coverUrl: URL.createObjectURL(cover),
+        projectUrl: URL.createObjectURL(projectFile),
+      });
+      onTitleChange(finalized.title);
+      setStatus("ready");
+    } catch (renderError) {
+      setError(renderError instanceof Error ? renderError.message : "The sound could not be rendered.");
+      setStatus("error");
+    }
+  };
+
+  return (
+    <section className={styles.finishPanel} aria-label="Finish track">
+      <div className={styles.finishPanelHeader}>
+        <div>
+          <span>04 / MASTER</span>
+          <h2>FINISH THE SOUND</h2>
+        </div>
+        <p>Render the canonical loop before any wallet or market action.</p>
+      </div>
+
+      <div className={styles.finishFields}>
+        <label>
+          <span>TRACK TITLE</span>
+          <input
+            aria-label="Track title"
+            maxLength={80}
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+          />
+        </label>
+        <label>
+          <span>FUTURE TICKER</span>
+          <input
+            aria-label="Token ticker"
+            maxLength={10}
+            value={symbol}
+            onChange={(event) => setSymbol(symbolFromTitle(event.target.value))}
+          />
+        </label>
+        <button
+          type="button"
+          className={styles.renderButton}
+          disabled={status === "rendering"}
+          onClick={() => void renderSound()}
+        >
+          {status === "rendering" ? "RENDERING…" : "RENDER WAV + COVER"}
+        </button>
+      </div>
+
+      {error ? <p className={styles.renderError}>{error}</p> : null}
+
+      {artifact ? (
+        <div className={styles.artifactPanel} role="status">
+          <audio aria-label="Finished track preview" controls src={artifact.audioUrl} />
+          <div>
+            <strong>MASTER READY</strong>
+            <span>{symbol} / WAV + SVG + PROJECT STATE</span>
+          </div>
+          <nav aria-label="Finished track downloads">
+            <a href={artifact.audioUrl} download={`${filename}.wav`}>WAV</a>
+            <a href={artifact.coverUrl} download={`${filename}-cover.svg`}>COVER</a>
+            <a href={artifact.projectUrl} download={`${filename}.tickerbeat.json`}>PROJECT</a>
+          </nav>
+        </div>
+      ) : null}
+
+      <div className={styles.launchGate}>
+        <span>BASE LAUNCH</span>
+        <strong>{artifact ? "ARTIFACT VERIFIED LOCALLY" : "WAITING FOR MASTER"}</strong>
+        <small>Wallet confirmation and the selected launch protocol arrive in the next slice.</small>
+      </div>
+    </section>
+  );
+}

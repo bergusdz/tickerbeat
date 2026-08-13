@@ -1,6 +1,7 @@
 import type { StudioProject, Track, TrackId } from "./model";
 
 export type ProjectAction =
+  | { type: "set-title"; value: string }
   | { type: "toggle-step"; trackId: TrackId; step: number }
   | { type: "set-tempo"; value: number }
   | { type: "set-swing"; value: number }
@@ -31,6 +32,11 @@ function updateTrack(
 
 export function reduceProject(project: StudioProject, action: ProjectAction): StudioProject {
   switch (action.type) {
+    case "set-title": {
+      const title = action.value.trim().slice(0, 80);
+      return title && title !== project.title ? { ...project, title } : project;
+    }
+
     case "toggle-step":
       if (!Number.isInteger(action.step) || action.step < 0 || action.step >= 16) {
         return project;
