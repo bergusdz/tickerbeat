@@ -7,19 +7,27 @@ import { parseTickerBeatRelease } from "./parse";
 import type { BoardRelease, ClankerApiToken } from "./types";
 
 const CLANKER_TOKENS_API = "https://www.clanker.world/api/tokens";
+const CLANKER_REQUEST_TIMEOUT_MS = 8_000;
 const baseClient = createPublicClient({
   chain: base,
   transport: http(process.env.BASE_RPC_URL),
 });
 
 async function clankerTokens(query: URLSearchParams): Promise<ClankerApiToken[]> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), CLANKER_REQUEST_TIMEOUT_MS);
   try {
-    const response = await fetch(`${CLANKER_TOKENS_API}?${query}`, { next: { revalidate: 60 } });
+    const response = await fetch(`${CLANKER_TOKENS_API}?${query}`, {
+      next: { revalidate: 60 },
+      signal: controller.signal,
+    });
     if (!response.ok) return [];
     const payload = (await response.json()) as { data?: ClankerApiToken[] };
     return payload.data ?? [];
   } catch {
     return [];
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

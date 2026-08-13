@@ -120,6 +120,7 @@ describe("Studio", () => {
     render(<Studio />);
 
     fireEvent.click(screen.getByRole("button", { name: "Select Bass track" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Mix" }));
     fireEvent.change(screen.getByRole("combobox", { name: "Bass instrument" }), {
       target: { value: "2" },
     });
@@ -140,6 +141,7 @@ describe("Studio", () => {
 
   it("trims and levels an imported sample clip", async () => {
     render(<Studio />);
+    fireEvent.click(screen.getByRole("tab", { name: "Mix" }));
     fireEvent.change(screen.getByLabelText("Import an audio clip"), {
       target: {
         files: [new File(["sample"], "signal.wav", { type: "audio/wav" })],

@@ -1,10 +1,14 @@
 :root {
-  --ink: #090a08;
-  --panel: #151713;
-  --paper: #f0eee5;
-  --muted: #8e9287;
-  --acid: #d9ff43;
-  --signal: #ff5a36;
+  --ink: #070806;
+  --machine: #11130f;
+  --panel: #171a15;
+  --paper: #f4f1e8;
+  --muted: #8d9385;
+  --line: rgba(244, 241, 232, 0.12);
+  --line-strong: #353a30;
+  --acid: #d2ff37;
+  --signal: #ff573d;
+  color-scheme: dark;
 }
 
 * {
@@ -21,15 +25,22 @@ body {
   min-height: 100vh;
   background: var(--ink);
   font-family: var(--font-mono), monospace;
+  text-rendering: optimizeLegibility;
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
 button {
   color: inherit;
+}
+
+::selection {
+  background: var(--acid);
+  color: var(--ink);
 }
 
 @media (prefers-reduced-motion: reduce) {
