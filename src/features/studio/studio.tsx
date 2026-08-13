@@ -120,8 +120,8 @@ export function Studio() {
   const [finishOpen, setFinishOpen] = useState(false);
   const draftRestored = useRef(false);
   const project = history.present;
-  const { isPlaying, currentStep, togglePlayback } = useStudioAudio(project);
   const soundClip = useSoundClip();
+  const { isPlaying, currentStep, togglePlayback } = useStudioAudio(project, soundClip.clip);
   const activeTrack = project.tracks.find((track) => track.id === selectedTrack) ?? project.tracks[0];
 
   const edit = (action: ProjectAction) => dispatch({ type: "edit", action });

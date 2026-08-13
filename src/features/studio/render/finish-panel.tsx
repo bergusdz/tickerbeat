@@ -57,7 +57,9 @@ export function FinishPanel({
 
     try {
       const finalized = { ...project, title: title.trim() || project.title };
-      const decodedClip = clip ? await decodeAudioBlob(clip.blob) : undefined;
+      const decodedClip = clip
+        ? { buffer: await decodeAudioBlob(clip.blob), settings: clip }
+        : undefined;
       const audio = await renderProjectToWav(finalized, decodedClip);
       const cover = createCoverSvg(finalized);
       const projectFile = new Blob([JSON.stringify({ version: 1, project: finalized }, null, 2)], {

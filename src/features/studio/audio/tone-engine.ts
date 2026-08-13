@@ -5,6 +5,7 @@ import type {
   Limiter,
   MembraneSynth,
   MonoSynth,
+  Player,
   PolySynth,
   Synth,
   Volume,
@@ -12,6 +13,8 @@ import type {
 
 import type { StudioProject, TrackId } from "../core/model";
 import { eventsAtStep } from "../core/schedule";
+import { clipPlaybackWindow } from "../recording/clip-playback";
+import type { SoundClip } from "../recording/use-sound-clip";
 import { cutoffFrequency, drumProfile, echoSendGain, oscillatorType } from "./sound-design";
 
 type ToneModule = typeof import("tone");
@@ -23,6 +26,14 @@ export function isSchedulableAudioTime(time: number): boolean {
 export function stepDurationMs(tempo: number, swing: number, step: number): number {
   const sixteenth = 60_000 / tempo / 4;
   return sixteenth * (step % 2 === 0 ? 1 + swing : 1 - swing);
+}
+
+export function loopDurationSeconds(tempo: number): number {
+  return (60 / tempo) * 4;
+}
+
+export function clipShouldTriggerAtStep(step: number): boolean {
+  return step === 0;
 }
 
 export class ToneStudioEngine {
@@ -39,6 +50,11 @@ export class ToneStudioEngine {
   private sends: Record<TrackId, Gain> | null = null;
   private delay: FeedbackDelay | null = null;
   private limiter: Limiter | null = null;
+  private clip: SoundClip | null = null;
+  private clipPlayer: Player | null = null;
+  private clipGain: Gain | null = null;
+  private loadedClipUrl: string | null = null;
+  private clipLoadVersion = 0;
 
   constructor(
     project: StudioProject,
@@ -52,12 +68,16 @@ export class ToneStudioEngine {
     if (!this.tone) return;
 
     await this.tone.start();
+    if (this.clip && this.loadedClipUrl !== this.clip.url) {
+      await this.loadClip(this.clip);
+    }
     if (this.timer === null) this.scheduleNextStep();
   }
 
   stop(): void {
     if (this.timer !== null) clearTimeout(this.timer);
     this.timer = null;
+    this.clipPlayer?.stop();
     this.step = 0;
     this.onStep(0);
   }
@@ -83,6 +103,18 @@ export class ToneStudioEngine {
     }
   }
 
+  updateClip(clip: SoundClip | null): void {
+    this.clip = clip;
+    if (!this.tone) return;
+
+    if (clip && clip.url === this.loadedClipUrl && this.clipPlayer && this.clipGain) {
+      this.clipGain.gain.rampTo(clip.level, 0.05);
+      return;
+    }
+
+    void this.loadClip(clip);
+  }
+
   dispose(): void {
     if (!this.tone) return;
 
@@ -92,6 +124,9 @@ export class ToneStudioEngine {
     this.bass?.dispose();
     this.chords?.dispose();
     this.lead?.dispose();
+    this.clipLoadVersion += 1;
+    this.clipPlayer?.dispose();
+    this.clipGain?.dispose();
     Object.values(this.volumes ?? {}).forEach((volume) => volume.dispose());
     Object.values(this.filters ?? {}).forEach((filter) => filter.dispose());
     Object.values(this.sends ?? {}).forEach((send) => send.dispose());
@@ -100,6 +135,9 @@ export class ToneStudioEngine {
 
     this.timer = null;
     this.tone = null;
+    this.clipPlayer = null;
+    this.clipGain = null;
+    this.loadedClipUrl = null;
   }
 
   private async initialize(): Promise<void> {
@@ -178,6 +216,7 @@ export class ToneStudioEngine {
     const current = this.step;
     const time = this.tone.now() + 0.02;
     if (isSchedulableAudioTime(time)) {
+      if (clipShouldTriggerAtStep(current)) this.triggerClip(time);
       for (const event of eventsAtStep(this.project, current)) {
         this.trigger(event.trackId, event.note, event.velocity, time);
       }
@@ -187,6 +226,46 @@ export class ToneStudioEngine {
     const duration = stepDurationMs(this.project.tempo, this.project.swing, current);
     this.step = (current + 1) % 16;
     this.timer = setTimeout(() => this.scheduleNextStep(), duration);
+  }
+
+  private async loadClip(clip: SoundClip | null): Promise<void> {
+    const version = ++this.clipLoadVersion;
+    this.clipPlayer?.stop();
+    this.clipPlayer?.dispose();
+    this.clipPlayer = null;
+    this.loadedClipUrl = null;
+
+    if (!clip || !this.tone || !this.limiter) return;
+
+    const player = new this.tone.Player();
+    try {
+      await player.load(clip.url);
+      if (version !== this.clipLoadVersion) {
+        player.dispose();
+        return;
+      }
+
+      if (!this.clipGain) this.clipGain = new this.tone.Gain(clip.level).connect(this.limiter);
+      player.connect(this.clipGain);
+      this.clipGain.gain.value = clip.level;
+      this.clipPlayer = player;
+      this.loadedClipUrl = clip.url;
+    } catch {
+      player.dispose();
+    }
+  }
+
+  private triggerClip(time: number): void {
+    if (!this.clip || !this.clipPlayer?.loaded || !this.clipGain) return;
+    const window = clipPlaybackWindow(
+      this.clipPlayer.buffer.duration,
+      this.clip,
+      loopDurationSeconds(this.project.tempo),
+    );
+    if (!window) return;
+
+    this.clipGain.gain.rampTo(window.gain, 0.02);
+    this.clipPlayer.start(time, window.offset, window.duration);
   }
 
   private trigger(

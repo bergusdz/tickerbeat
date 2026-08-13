@@ -2,6 +2,7 @@ import type { StudioProject, Track, TrackId } from "../core/model";
 import { eventsAtStep } from "../core/schedule";
 import { stepDurationMs } from "../audio/tone-engine";
 import { cutoffFrequency, drumProfile, echoSendGain, oscillatorType } from "../audio/sound-design";
+import { clipPlaybackWindow, type ClipPlaybackSettings } from "../recording/clip-playback";
 import { audioBufferToWav, projectDurationSeconds } from "./render-utils";
 
 const SEMITONES: Record<string, number> = {
@@ -112,7 +113,7 @@ function createTrackBuses(
 
 export async function renderProjectToWav(
   project: StudioProject,
-  optionalClip?: AudioBuffer,
+  optionalClip?: { buffer: AudioBuffer; settings: ClipPlaybackSettings },
 ): Promise<Blob> {
   if (typeof OfflineAudioContext === "undefined") {
     throw new Error("Offline audio rendering is not supported in this browser.");
@@ -167,12 +168,14 @@ export async function renderProjectToWav(
   }
 
   if (optionalClip) {
+    const window = clipPlaybackWindow(optionalClip.buffer.duration, optionalClip.settings, duration);
+    if (!window) return audioBufferToWav(await context.startRendering());
     const source = context.createBufferSource();
     const clipGain = context.createGain();
-    source.buffer = optionalClip;
-    clipGain.gain.value = 0.7;
+    source.buffer = optionalClip.buffer;
+    clipGain.gain.value = window.gain;
     source.connect(clipGain).connect(compressor);
-    source.start(0, 0, Math.min(optionalClip.duration, duration));
+    source.start(0, window.offset, window.duration);
   }
 
   return audioBufferToWav(await context.startRendering());
