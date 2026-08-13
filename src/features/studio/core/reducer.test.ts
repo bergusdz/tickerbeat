@@ -1,0 +1,64 @@
+import { describe, expect, it } from "vitest";
+
+import { createDemoProject } from "./model";
+import { reduceProject } from "./reducer";
+
+describe("reduceProject", () => {
+  it("toggles one step without mutating the previous project", () => {
+    const project = createDemoProject();
+    const previous = project.tracks[1].steps[2].active;
+
+    const next = reduceProject(project, {
+      type: "toggle-step",
+      trackId: "bass",
+      step: 2,
+    });
+
+    expect(next.tracks[1].steps[2].active).toBe(!previous);
+    expect(project.tracks[1].steps[2].active).toBe(previous);
+  });
+
+  it("returns the same project for an invalid step index", () => {
+    const project = createDemoProject();
+
+    expect(
+      reduceProject(project, { type: "toggle-step", trackId: "lead", step: 16 }),
+    ).toBe(project);
+  });
+
+  it("clamps tempo, swing, and volume to safe ranges", () => {
+    const project = createDemoProject();
+    const fast = reduceProject(project, { type: "set-tempo", value: 999 });
+    const unswung = reduceProject(fast, { type: "set-swing", value: -1 });
+    const loud = reduceProject(unswung, {
+      type: "set-volume",
+      trackId: "lead",
+      value: 20,
+    });
+
+    expect(fast.tempo).toBe(170);
+    expect(unswung.swing).toBe(0);
+    expect(loud.tracks[3].volume).toBe(6);
+  });
+
+  it("toggles mute and solo on only the selected track", () => {
+    const project = createDemoProject();
+    const muted = reduceProject(project, { type: "toggle-mute", trackId: "chords" });
+    const soloed = reduceProject(muted, { type: "toggle-solo", trackId: "lead" });
+
+    expect(muted.tracks.map((track) => track.muted)).toEqual([false, false, true, false]);
+    expect(soloed.tracks.map((track) => track.solo)).toEqual([false, false, false, true]);
+  });
+
+  it("clears steps while preserving mixer settings", () => {
+    const project = createDemoProject();
+    project.tracks[0].volume = -9;
+    project.tracks[0].muted = true;
+
+    const next = reduceProject(project, { type: "clear-track", trackId: "drums" });
+
+    expect(next.tracks[0].steps.every((step) => !step.active)).toBe(true);
+    expect(next.tracks[0].volume).toBe(-9);
+    expect(next.tracks[0].muted).toBe(true);
+  });
+});

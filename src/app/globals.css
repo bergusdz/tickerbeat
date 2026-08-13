@@ -1,0 +1,44 @@
+:root {
+  --ink: #090a08;
+  --panel: #151713;
+  --paper: #f0eee5;
+  --muted: #8e9287;
+  --acid: #d9ff43;
+  --signal: #ff5a36;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  font-family: var(--font-mono), monospace;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,67 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+import { Studio } from "./studio";
+
+const audio = vi.hoisted(() => ({
+  togglePlayback: vi.fn(),
+}));
+
+vi.mock("./use-studio-audio", () => ({
+  useStudioAudio: () => ({
+    isPlaying: false,
+    currentStep: 0,
+    togglePlayback: audio.togglePlayback,
+  }),
+}));
+
+describe("Studio", () => {
+  beforeEach(() => audio.togglePlayback.mockClear());
+
+  it("renders all four instrument tracks", () => {
+    render(<Studio />);
+
+    expect(screen.getByRole("button", { name: "Select Drums track" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Select Bass track" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Select Chords track" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Select Lead track" })).toBeInTheDocument();
+  });
+
+  it("toggles a sequencer step", () => {
+    render(<Studio />);
+    const step = screen.getByRole("button", { name: "Drums step 2" });
+
+    expect(step).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(step);
+    expect(step).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("updates the tempo display", () => {
+    render(<Studio />);
+
+    fireEvent.change(screen.getByRole("slider", { name: "Tempo" }), {
+      target: { value: "132" },
+    });
+
+    expect(screen.getByText("132", { selector: "output" })).toBeInTheDocument();
+  });
+
+  it("clears and restores the active track", () => {
+    render(<Studio />);
+    const firstStep = screen.getByRole("button", { name: "Drums step 1" });
+    expect(firstStep).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Clear Drums" }));
+    expect(firstStep).toHaveAttribute("aria-pressed", "false");
+
+    fireEvent.click(screen.getByRole("button", { name: "Undo last edit" }));
+    expect(firstStep).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("starts playback from the transport", () => {
+    render(<Studio />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Play beat" }));
+    expect(audio.togglePlayback).toHaveBeenCalledOnce();
+  });
+});
