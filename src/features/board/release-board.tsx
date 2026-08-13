@@ -1,10 +1,9 @@
 import Image from "next/image";
+import Link from "next/link";
 
-import { parseTickerBeatRelease } from "./parse";
+import { getTickerBeatReleases } from "./clanker-api";
 import styles from "./release-board.module.css";
-import type { ClankerApiToken } from "./types";
 
-const CLANKER_TOKENS_API = "https://www.clanker.world/api/tokens";
 const FALLBACK_GATEWAY = "https://ipfs.io/ipfs/";
 
 function playableUrl(uri: string | null): string | undefined {
@@ -12,26 +11,8 @@ function playableUrl(uri: string | null): string | undefined {
   return uri.startsWith("ipfs://") ? `${FALLBACK_GATEWAY}${uri.slice(7)}` : uri;
 }
 
-async function releases() {
-  try {
-    const query = new URLSearchParams({
-      socialInterface: "TickerBeat",
-      chainId: "8453",
-      sortBy: "deployed-at",
-      sort: "desc",
-      limit: "20",
-    });
-    const response = await fetch(`${CLANKER_TOKENS_API}?${query}`, { next: { revalidate: 60 } });
-    if (!response.ok) return [];
-    const payload = (await response.json()) as { data?: ClankerApiToken[] };
-    return (payload.data ?? []).map(parseTickerBeatRelease).filter((release) => release !== null);
-  } catch {
-    return [];
-  }
-}
-
 export async function ReleaseBoard() {
-  const items = await releases();
+  const items = await getTickerBeatReleases();
 
   return (
     <section id="board" className={styles.board}>
@@ -68,6 +49,7 @@ export async function ReleaseBoard() {
               <strong>${release.symbol}</strong>
               <audio controls preload="none" src={playableUrl(release.audioUrl)} />
               <nav>
+                <Link href={`/track/${release.address}`}>LISTEN ↗</Link>
                 <a href={`https://base.app/coin/base-mainnet/${release.address}`} target="_blank" rel="noreferrer">TRADE ↗</a>
                 <a href={`https://basescan.org/token/${release.address}`} target="_blank" rel="noreferrer">VERIFY ↗</a>
               </nav>

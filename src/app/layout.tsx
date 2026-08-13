@@ -16,9 +16,21 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://tickerbeat.vercel.app"),
   title: "TickerBeat — Make a beat. Launch a ticker.",
   description:
     "A browser groovebox where every finished sound can become a token on Base.",
+  applicationName: "TickerBeat",
+  openGraph: {
+    title: "TickerBeat — Sound is the new ticker.",
+    description: "Build a loop in the browser, publish its sound, and launch its market on Base.",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "TickerBeat — Sound is the new ticker.",
+    description: "Build a loop in the browser, publish its sound, and launch its market on Base.",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

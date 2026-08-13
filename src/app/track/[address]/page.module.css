@@ -1,0 +1,122 @@
+.page {
+  min-height: 100vh;
+  padding: 28px clamp(18px, 4vw, 64px) 64px;
+  background:
+    radial-gradient(circle at 75% 18%, rgba(217, 255, 67, 0.09), transparent 30%),
+    var(--ink);
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(240, 238, 229, 0.15);
+}
+
+.topbar a {
+  color: var(--paper);
+  font: 600 10px var(--font-mono), monospace;
+  text-decoration: none;
+}
+
+.topbar span {
+  color: var(--acid);
+  font-size: 9px;
+}
+
+.release {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.8fr) 1fr;
+  gap: clamp(28px, 6vw, 88px);
+  max-width: 1180px;
+  margin: 72px auto 0;
+}
+
+.artwork,
+.fallback {
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1px solid #464940;
+  object-fit: cover;
+  box-shadow: 18px 18px 0 #11140d;
+}
+
+.fallback {
+  display: grid;
+  place-items: center;
+  background: #171d10;
+  color: var(--acid);
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(64px, 12vw, 160px);
+}
+
+.details {
+  display: grid;
+  align-content: center;
+  gap: 18px;
+}
+
+.details > span {
+  color: var(--acid);
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.details h1 {
+  margin: 0;
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(42px, 7vw, 88px);
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+}
+
+.ticker {
+  color: var(--signal);
+  font-size: 15px;
+}
+
+.details audio {
+  width: 100%;
+}
+
+.details p {
+  margin: 0;
+  color: #8e9287;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.actions a {
+  padding: 14px 17px;
+  border: 1px solid #515646;
+  color: var(--paper);
+  font-size: 9px;
+  text-decoration: none;
+}
+
+.actions a:first-child {
+  border-color: var(--acid);
+  background: var(--acid);
+  color: #090a08;
+}
+
+.address {
+  overflow-wrap: anywhere;
+  padding-top: 14px;
+  border-top: 1px solid #30352a;
+}
+
+@media (max-width: 760px) {
+  .release { grid-template-columns: 1fr; margin-top: 42px; }
+  .artwork, .fallback { max-width: 520px; }
+}
