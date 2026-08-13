@@ -556,6 +556,84 @@
   color: #aeb3a5;
 }
 
+.releaseRail {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.releaseStage {
+  display: grid;
+  align-content: start;
+  gap: 9px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #3e4731;
+  background: #0a0d07;
+}
+
+.releaseStage > span {
+  color: var(--acid);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+}
+
+.releaseStage > strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 14px;
+}
+
+.releaseStage small,
+.releaseStage p {
+  margin: 0;
+  color: #858a7e;
+  font-size: 8px;
+  line-height: 1.55;
+}
+
+.releaseStage button,
+.releaseStage a {
+  min-height: 38px;
+  padding: 0 12px;
+  border: 1px solid #515646;
+  border-radius: 3px;
+  background: #1b1f17;
+  color: var(--paper);
+  font: 700 8px var(--font-mono), monospace;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.releaseStage a {
+  display: inline-flex;
+  align-items: center;
+  width: max-content;
+}
+
+.releaseStage button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.walletChoices,
+.launchActions,
+.launchLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.launchActions {
+  display: grid;
+}
+
+.releaseStage .launchConfirm {
+  border-color: var(--acid);
+  background: var(--acid);
+  color: #0a0b08;
+}
+
 .workbench {
   display: grid;
   grid-template-columns: 260px minmax(580px, 1fr) 230px;
@@ -1188,6 +1266,10 @@
 
   .launchGate strong {
     margin-left: 0;
+  }
+
+  .releaseRail {
+    grid-template-columns: 1fr;
   }
 
   .playButton,

@@ -5,14 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import type { StudioProject } from "../core/model";
 import type { SoundClip } from "../recording/use-sound-clip";
 import styles from "../studio.module.css";
+import { PublishPanel } from "../../publication/publish-panel";
+import type { PublishableArtifact } from "../../publication/types";
 import { decodeAudioBlob, renderProjectToWav } from "./render-project";
 import { createCoverSvg } from "./render-utils";
 
-type FinishedArtifact = {
-  audioUrl: string;
-  coverUrl: string;
-  projectUrl: string;
-};
+type FinishedArtifact = PublishableArtifact;
 
 export function symbolFromTitle(title: string): string {
   const compact = title.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 10);
@@ -59,6 +57,12 @@ export function FinishPanel({
         type: "application/json",
       });
       setArtifact({
+        title: finalized.title,
+        symbol,
+        tempo: finalized.tempo,
+        audio,
+        cover,
+        project: projectFile,
         audioUrl: URL.createObjectURL(audio),
         coverUrl: URL.createObjectURL(cover),
         projectUrl: URL.createObjectURL(projectFile),
@@ -130,8 +134,10 @@ export function FinishPanel({
       <div className={styles.launchGate}>
         <span>BASE LAUNCH</span>
         <strong>{artifact ? "ARTIFACT VERIFIED LOCALLY" : "WAITING FOR MASTER"}</strong>
-        <small>Wallet confirmation and the selected launch protocol arrive in the next slice.</small>
+        <small>IPFS publication happens before any wallet or market action.</small>
       </div>
+
+      {artifact ? <PublishPanel artifact={artifact} /> : null}
     </section>
   );
 }

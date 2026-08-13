@@ -39,37 +39,24 @@ automatically.
 
 ## 3. Launch protocol decision
 
-### Selected for MVP: Zora Content Coins
+### Selected for MVP: Clanker v4
 
-Zora Content Coins is the closest existing production architecture to the
-TickerBeat model:
+TickerBeat uses the official `clanker-sdk` v4 integration:
 
-- one content object becomes one ERC-20;
-- it is deployed on Base through a shared factory;
-- the factory creates its Uniswap v4 market;
-- metadata follows EIP-7572 and supports `animation_url` for audio;
-- the creator, payout recipient, platform referrer, metadata URI, and ticker
-  are explicit launch inputs;
-- factory events expose enough data to build a project board and recover the
-  read model;
-- the official SDK can return transaction calldata for the user's wallet;
-- existing open-source music projects already use this path.
+- Base is a first-class supported deployment chain;
+- one wallet-confirmed transaction creates the ERC-20 and Uniswap v4 pool;
+- the SDK exposes typed transaction construction, simulation, predicted token
+  address, receipt parsing, and wallet-client deployment;
+- WETH pairing, market-cap presets, static fees, sniper-fee decay, vaults, and
+  creator/interface reward recipients are existing protocol configuration;
+- `dataSuffix` supports Base Builder Code attribution without a custom factory;
+- deployment context identifies TickerBeat as the originating interface.
 
-TickerBeat will use an ETH-backed Content Coin for the first release. A Zora
-Creator Coin is not required. TickerBeat's address is supplied as the platform
-referrer and the musician remains the creator/payout recipient.
-
-### Reserved alternative: Clanker v4
-
-Clanker v4 is a valid generic Base token launcher with a fixed token supply,
-Uniswap v4 liquidity, metadata, configurable paired assets, market-cap
-settings, and creator/interface reward splits. It remains the fallback if a
-verified compatibility spike shows that Zora's create or trade flow cannot
-support the target Base wallet experience.
-
-Clanker is not used simultaneously with Zora in the MVP. Supporting two launch
-rails would duplicate metadata, indexing, quoting, and failure handling without
-improving the first user experience.
+The first release uses a conservative WETH pool and official defaults unless a
+documented product requirement justifies a different preset. TickerBeat does
+not add a second launch rail in the MVP. The audio, cover, project state, and
+public track page remain TickerBeat artifacts referenced from the launch
+metadata and indexed by the application.
 
 ### Explicitly excluded: custom token factory and AMM
 
@@ -85,8 +72,8 @@ Browser DJ desk
   -> canonical project state
   -> offline audio render
   -> IPFS audio + cover + EIP-7572 metadata
-  -> Zora createCoinCall transaction
-  -> Zora Content Coin + Uniswap v4 market on Base
+  -> Clanker v4 deploy transaction
+  -> standard ERC-20 + Uniswap v4 market on Base
   -> event/indexing layer
   -> public playable token board
 ```
@@ -96,11 +83,11 @@ The system has four deliberately separate boundaries:
 1. **Music engine:** deterministic project state, sequencer, playback, samples,
    recording, effects, and offline rendering.
 2. **Publication:** asset validation, hashing, upload, and immutable metadata.
-3. **Launch adapter:** Zora transaction construction and receipt parsing.
+3. **Launch adapter:** Clanker v4 transaction construction and receipt parsing.
 4. **Discovery/trading:** board, token page, market reads, and wallet-confirmed
    swaps.
 
-The music engine must not import wallet, chain, IPFS, or Zora code. The launch
+The music engine must not import wallet, chain, IPFS, or Clanker code. The launch
 adapter receives a completed publication receipt and cannot edit the sound.
 
 ## 5. Repository layout
@@ -117,7 +104,7 @@ src/
   features/
     studio/              Project state, sequencer UI, audio, rendering
     publication/         Canonical metadata and storage adapter
-    launch/              Typed Zora launch and receipt adapter
+    launch/              Typed Clanker v4 launch and receipt adapter
     discovery/           Board, token pages, and event normalization
   shared/                Small cross-feature UI and infrastructure helpers
 docs/
@@ -168,24 +155,23 @@ assets rather than producing duplicate files.
 
 ## 8. Launch transaction
 
-The launch adapter builds the official Zora `createCoinCall` transaction with:
+The launch adapter builds the official Clanker v4 deployment transaction with:
 
 - connected wallet as `creator`;
 - user-selected title and validated symbol;
-- final IPFS metadata URI;
-- ETH-backed currency mode;
-- TickerBeat platform-referrer address;
-- creator-controlled payout recipient;
+- final IPFS cover plus TickerBeat track-page metadata;
+- WETH paired-token mode;
+- creator and TickerBeat interface reward recipients;
 - Base chain ID;
-- a fixed, product-selected starting-market-cap option.
+- a fixed, product-selected pool-position preset and static fee configuration.
 
 The app shows the network, creator, predicted address, metadata URI, transaction
 value, and protocol before confirmation. The connected wallet signs and sends
 the transaction. TickerBeat stores no user private key and performs no server-
 side deployment on the user's behalf.
 
-The receipt is considered launched only after the expected factory event is
-found and its creator, URI, and predicted address match the pending launch.
+The receipt is considered launched only after the expected `TokenCreated` event
+is found and its creator and predicted address match the pending launch.
 
 ## 9. Board and token page
 
@@ -204,13 +190,12 @@ intent.
 
 The token page adds full playback, metadata/provenance, Base explorer links,
 market data, and buy/sell controls. Every trade uses a quoted amount, explicit
-slippage, and wallet confirmation. If the official Zora trade helper does not
-support the target wallet type, the MVP links to the verified external market
-rather than silently adding a custom router.
+slippage, and wallet confirmation. The MVP links to Clanker's verified market
+or the Base token deep link before considering any custom trade router.
 
 ## 10. Indexing
 
-The authoritative launch source is the Zora factory event, not a mutable form
+The authoritative launch source is the Clanker factory event, not a mutable form
 submission. The read model normalizes creation events and enriches them with
 IPFS metadata and market reads.
 
@@ -234,8 +219,8 @@ Before mainnet launch, run a small compatibility spike covering:
 
 - connected EOA wallet;
 - Base Account or other smart-wallet transaction path;
-- Zora create calldata through wagmi;
-- Zora trade helper or the verified external trade fallback;
+- Clanker v4 deployment through a wagmi-provided wallet client;
+- Clanker market and Base token deep-link handoff;
 - Base Builder Code attribution where the transaction client supports a data
   suffix without changing protocol calldata semantics.
 
@@ -277,7 +262,7 @@ preview of the future token card.
 
 ### Slice 4: Base launch
 
-Integrate Zora create calldata, wallet confirmation, receipt verification, and
+Integrate Clanker v4 calldata, wallet confirmation, receipt verification, and
 Base explorer links. Test the complete path with the least risky supported
 environment before mainnet.
 
@@ -300,7 +285,7 @@ The MVP is ready for public launch when:
 - samples and optional microphone audio survive preview and offline render;
 - the rendered audio and metadata are content-addressed and independently
   retrievable;
-- a connected user can explicitly launch that sound through the selected Zora
+- a connected user can explicitly launch that sound through the selected Clanker
   factory on Base;
 - the resulting address and metadata match the confirmed factory event;
 - the public board can play the sound and open its verified token page;
@@ -314,10 +299,8 @@ The MVP is ready for public launch when:
 
 ## 15. Primary implementation references
 
-- Zora protocol and contract documentation: <https://github.com/ourzora/zora-protocol>
-- Zora Coins SDK documentation: <https://docs.zora.co/coins/sdk/create-coin>
-- Zora coin metadata: <https://docs.zora.co/coins/contracts/metadata>
-- Zora contract architecture: <https://docs.zora.co/coins/contracts/architecture>
-- Clanker SDK, reserved alternative: <https://github.com/clanker-devco/clanker-sdk>
-- Songcoin, music-to-Zora reference: <https://github.com/0xgonzalo/songcoin>
-- This Song Meant, music metadata reference: <https://github.com/Nishu0/thissongmeant>
+- Clanker SDK: <https://github.com/clanker-devco/clanker-sdk>
+- Clanker generated documentation: <https://github.com/clanker-devco/DOCS>
+- Base token launch guidance: <https://docs.base.org/get-started/launch-token>
+- Base standard web-app migration guidance: <https://docs.base.org/apps/guides/migrate-to-standard-web-app>
+- Base Builder Codes: <https://docs.base.org/apps/builder-codes/builder-codes>

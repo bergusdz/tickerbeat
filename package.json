@@ -14,10 +14,15 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@tanstack/react-query": "5.101.4",
+    "clanker-sdk": "4.2.18",
     "next": "16.3.0",
+    "pinata": "2.5.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "tone": "15.1.22"
+    "tone": "15.1.22",
+    "viem": "2.55.13",
+    "wagmi": "3.7.6"
   },
   "devDependencies": {
     "@testing-library/dom": "10.4.1",
@@ -29,7 +34,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.0",
     "jsdom": "30.0.1",
-    "typescript": "6.0.3",
+    "typescript": "5.9.3",
     "vitest": "4.1.10"
   }
 }

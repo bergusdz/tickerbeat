@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, Unbounded } from "next/font/google";
 
+import { Providers } from "./providers";
 import "./globals.css";
 
 const display = Unbounded({
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${display.variable} ${mono.variable}`}>{children}</body>
+      <body className={`${display.variable} ${mono.variable}`}><Providers>{children}</Providers></body>
     </html>
   );
 }
