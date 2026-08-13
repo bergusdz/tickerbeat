@@ -2,10 +2,10 @@
 
 import { useRef, useState } from "react";
 
-import type { ReturnTypeUseSoundClip } from "./types";
+import type { SoundClipController } from "./types";
 import styles from "../studio.module.css";
 
-export function SoundClipPanel({ control }: { control: ReturnTypeUseSoundClip }) {
+export function SoundClipPanel({ control }: { control: SoundClipController }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const previewAudio = useRef<HTMLAudioElement>(null);
   const [duration, setDuration] = useState(0);
@@ -168,7 +168,7 @@ export function SoundClipPanel({ control }: { control: ReturnTypeUseSoundClip })
           if (file) {
             stopPreview();
             setDuration(0);
-            control.importFile(file);
+            void control.importFile(file);
           }
           event.target.value = "";
         }}

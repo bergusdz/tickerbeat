@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { ToneStudioEngine } from "./audio/tone-engine";
 import type { StudioProject } from "./core/model";
-import type { SoundClip } from "./recording/use-sound-clip";
+import type { SoundClip } from "./recording/types";
 
 export function useStudioAudio(project: StudioProject, clip: SoundClip | null = null) {
   const [isPlaying, setIsPlaying] = useState(false);

@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useReducer, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useReducer, useRef, useState, type CSSProperties } from "react";
 
 import { commit, createHistory, redo, undo, type ProjectHistory } from "./core/history";
-import { createDemoProject, type Track, type TrackId } from "./core/model";
+import { createDemoProject, type ClipReference, type Track, type TrackId } from "./core/model";
 import {
   parseStoredProject,
   LEGACY_PROJECT_STORAGE_KEY,
   PROJECT_STORAGE_KEY,
+  VERSION_TWO_PROJECT_STORAGE_KEY,
   serializeProject,
 } from "./core/project-storage";
 import type { ProjectAction } from "./core/reducer";
@@ -120,7 +121,11 @@ export function Studio() {
   const [finishOpen, setFinishOpen] = useState(false);
   const draftRestored = useRef(false);
   const project = history.present;
-  const soundClip = useSoundClip();
+  const updateClipReference = useCallback(
+    (value: ClipReference | null) => dispatch({ type: "edit", action: { type: "set-clip", value } }),
+    [],
+  );
+  const soundClip = useSoundClip(project.clip, updateClipReference);
   const { isPlaying, currentStep, togglePlayback } = useStudioAudio(project, soundClip.clip);
   const activeTrack = project.tracks.find((track) => track.id === selectedTrack) ?? project.tracks[0];
 
@@ -128,7 +133,9 @@ export function Studio() {
 
   useEffect(() => {
     const stored = parseStoredProject(
-      localStorage.getItem(PROJECT_STORAGE_KEY) ?? localStorage.getItem(LEGACY_PROJECT_STORAGE_KEY),
+      localStorage.getItem(PROJECT_STORAGE_KEY) ??
+        localStorage.getItem(VERSION_TWO_PROJECT_STORAGE_KEY) ??
+        localStorage.getItem(LEGACY_PROJECT_STORAGE_KEY),
     );
     queueMicrotask(() => {
       if (stored) dispatch({ type: "restore", project: stored });

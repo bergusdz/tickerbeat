@@ -112,4 +112,24 @@ describe("reduceProject", () => {
     expect(echoed.tracks[0]).toEqual(project.tracks[0]);
     expect(reduceProject(project, { type: "set-instrument", trackId: "bass", value: 7 })).toBe(project);
   });
+
+  it("binds and removes a content-addressed clip reference", () => {
+    const project = createDemoProject();
+    const clip = {
+      assetId: "a".repeat(64),
+      sha256: "a".repeat(64),
+      name: "signal.wav",
+      mimeType: "audio/wav",
+      size: 42,
+      source: "file" as const,
+      level: 0.7,
+      trimStart: 0,
+      trimEnd: 1,
+    };
+
+    const withClip = reduceProject(project, { type: "set-clip", value: clip });
+
+    expect(withClip.clip).toEqual(clip);
+    expect(reduceProject(withClip, { type: "set-clip", value: null }).clip).toBeNull();
+  });
 });

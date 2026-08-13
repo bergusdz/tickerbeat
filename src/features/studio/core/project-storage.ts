@@ -8,6 +8,7 @@ import {
 } from "./model";
 
 export const PROJECT_STORAGE_KEY = "tickerbeat.project.v3";
+export const VERSION_TWO_PROJECT_STORAGE_KEY = "tickerbeat.project.v2";
 export const LEGACY_PROJECT_STORAGE_KEY = "tickerbeat.project.v1";
 
 type LegacyTrack = Omit<Track, "instrument" | "filter" | "echo">;
@@ -88,6 +89,7 @@ function isClipReference(value: unknown): value is ClipReference {
     value.trimStart >= 0 &&
     typeof value.trimEnd === "number" &&
     value.trimEnd >= 0 &&
+    value.trimEnd <= 1 &&
     value.trimEnd >= value.trimStart
   );
 }

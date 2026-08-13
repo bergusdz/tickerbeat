@@ -14,7 +14,7 @@ import type {
 import type { StudioProject, TrackId } from "../core/model";
 import { eventsAtStep } from "../core/schedule";
 import { clipPlaybackWindow } from "../recording/clip-playback";
-import type { SoundClip } from "../recording/use-sound-clip";
+import type { SoundClip } from "../recording/types";
 import { cutoffFrequency, drumProfile, echoSendGain, oscillatorType } from "./sound-design";
 
 type ToneModule = typeof import("tone");
