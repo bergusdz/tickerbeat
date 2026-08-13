@@ -1,7 +1,16 @@
+import { createPublicClient, http, isAddress } from "viem";
+import { base } from "viem/chains";
+
+import { factoryEventForToken } from "../discovery/factory-event";
+import { reconcileLaunchRecord } from "../discovery/reconcile-launch";
 import { parseTickerBeatRelease } from "./parse";
 import type { BoardRelease, ClankerApiToken } from "./types";
 
 const CLANKER_TOKENS_API = "https://www.clanker.world/api/tokens";
+const baseClient = createPublicClient({
+  chain: base,
+  transport: http(process.env.BASE_RPC_URL),
+});
 
 async function clankerTokens(query: URLSearchParams): Promise<ClankerApiToken[]> {
   try {
@@ -14,6 +23,27 @@ async function clankerTokens(query: URLSearchParams): Promise<ClankerApiToken[]>
   }
 }
 
+async function verifiedRelease(candidate: ClankerApiToken): Promise<BoardRelease | null> {
+  if (
+    !candidate.contract_address ||
+    !isAddress(candidate.contract_address) ||
+    !candidate.tx_hash ||
+    !/^0x[0-9a-fA-F]{64}$/.test(candidate.tx_hash)
+  ) return null;
+
+  try {
+    const receipt = await baseClient.getTransactionReceipt({
+      hash: candidate.tx_hash as `0x${string}`,
+    });
+    const event = factoryEventForToken(receipt.logs, candidate.contract_address);
+    if (!event) return null;
+    const record = reconcileLaunchRecord(candidate, event);
+    return parseTickerBeatRelease(candidate, record);
+  } catch {
+    return null;
+  }
+}
+
 export async function getTickerBeatReleases(): Promise<BoardRelease[]> {
   const query = new URLSearchParams({
     socialInterface: "TickerBeat",
@@ -22,7 +52,8 @@ export async function getTickerBeatReleases(): Promise<BoardRelease[]> {
     sort: "desc",
     limit: "20",
   });
-  return (await clankerTokens(query)).map(parseTickerBeatRelease).filter((release) => release !== null);
+  const releases = await Promise.all((await clankerTokens(query)).map(verifiedRelease));
+  return releases.filter((release) => release !== null);
 }
 
 export async function getTickerBeatRelease(address: string): Promise<BoardRelease | null> {
@@ -30,5 +61,5 @@ export async function getTickerBeatRelease(address: string): Promise<BoardReleas
   const query = new URLSearchParams({ q: address, chainId: "8453", limit: "5", includeMarket: "true" });
   const tokens = await clankerTokens(query);
   const exact = tokens.find((token) => token.contract_address?.toLowerCase() === address.toLowerCase());
-  return exact ? parseTickerBeatRelease(exact) : null;
+  return exact ? verifiedRelease(exact) : null;
 }

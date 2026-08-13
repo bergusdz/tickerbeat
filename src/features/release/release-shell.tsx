@@ -13,7 +13,9 @@ import {
 import { base } from "wagmi/chains";
 
 import { getBaseWalletAfterSwitch } from "../launch/base-wallet";
+import { CLANKER_V4_BASE_FACTORY } from "../launch/launch-receipt";
 import { LaunchPanel } from "../launch/launch-panel";
+import { saveLaunchRecord } from "../discovery/launch-record-store";
 import { PublishPanel } from "../publication/publish-panel";
 import type { PublishableArtifact, PublicationReceipt } from "../publication/types";
 import styles from "../studio/studio.module.css";
@@ -164,6 +166,16 @@ export function ReleaseShell({
       dispatch({ type: "launch-submitted", txHash: submitted.txHash });
       const confirmed = await launcher.confirm(submitted, review);
       dispatch({ type: "launch-confirmed", receipt: confirmed });
+      saveLaunchRecord({
+        chainId: 8453,
+        factory: CLANKER_V4_BASE_FACTORY,
+        token: confirmed.tokenAddress,
+        creator: confirmed.creator,
+        admin: confirmed.creator,
+        metadataUri: confirmed.metadataUri,
+        transactionHash: confirmed.txHash,
+        blockNumber: confirmed.blockNumber,
+      });
       void fetch("/api/clanker/index", {
         method: "POST",
         headers: { "content-type": "application/json" },
