@@ -2,7 +2,7 @@ import type { CSSProperties } from "react";
 
 import type { StudioProject, Track, TrackId } from "../core/model";
 import type { ProjectAction } from "../core/reducer";
-import styles from "../studio.module.css";
+import styles from "./step-grid.module.css";
 
 function ChannelButton({
   track,
@@ -157,4 +157,3 @@ export function StepGrid({
     </section>
   );
 }
-

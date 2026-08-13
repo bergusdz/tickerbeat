@@ -1,6 +1,6 @@
 import type { StudioProject } from "../core/model";
 import type { ProjectAction } from "../core/reducer";
-import styles from "../studio.module.css";
+import styles from "./transport.module.css";
 
 export function Transport({
   project,
@@ -79,4 +79,3 @@ export function Transport({
     </section>
   );
 }
-

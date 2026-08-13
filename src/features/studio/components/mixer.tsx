@@ -4,7 +4,7 @@ import { INSTRUMENT_LABELS } from "../audio/sound-design";
 import type { StudioProject, Track, TrackId } from "../core/model";
 import type { ProjectAction } from "../core/reducer";
 import type { SoundClipController } from "../recording/types";
-import styles from "../studio.module.css";
+import styles from "./mixer.module.css";
 import { ClipDeck } from "./clip-deck";
 
 function ChannelStrip({
@@ -229,4 +229,3 @@ export function Mixer({
     </div>
   );
 }
-

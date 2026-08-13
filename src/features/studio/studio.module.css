@@ -248,7 +248,6 @@
 }
 
 .makeStage,
-.mixStage,
 .finishPanel,
 .boardPlaceholder {
   padding: clamp(14px, 2.2vw, 28px);
@@ -259,136 +258,10 @@
   gap: 14px;
 }
 
-.transport {
-  display: grid;
-  grid-template-columns: minmax(210px, 1.35fr) minmax(150px, 0.72fr) minmax(150px, 0.72fr) minmax(150px, 0.8fr);
-  gap: 10px;
-}
-
-.playButton,
-.transportDial,
-.historyControls {
-  min-height: 92px;
-  border: 1px solid #34382f;
-  border-radius: 12px;
-  background: #0c0f0b;
-}
-
-.playButton {
-  display: grid;
-  grid-template-columns: 48px 1fr;
-  grid-template-rows: auto auto;
-  align-content: center;
-  column-gap: 14px;
-  padding: 14px 18px;
-  border-color: var(--acid);
-  color: var(--paper);
-  text-align: left;
-  cursor: pointer;
-  transition: background 150ms ease, color 150ms ease, transform 150ms ease;
-}
-
-.playButton:hover,
-.playButton:focus-visible,
-.playButton.playing {
-  background: var(--acid);
-  color: #070906;
-}
-
-.playButton:active {
-  transform: translateY(1px);
-}
-
-.playButton > span {
-  grid-row: 1 / 3;
-  align-self: center;
-  font-size: 1.55rem;
-}
-
-.playButton strong {
-  font-family: var(--font-display), sans-serif;
-  font-size: 1.15rem;
-  text-transform: uppercase;
-}
-
-.playButton small {
-  font-size: 0.58rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.transportDial {
-  display: grid;
-  grid-template-columns: 1fr auto auto;
-  align-content: center;
-  gap: 4px 7px;
-  padding: 13px 15px;
-}
-
-.transportDial > span,
-.transportDial small {
-  color: var(--muted);
-  font-size: 0.58rem;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.transportDial output {
-  color: var(--paper);
-  font-family: var(--font-display), sans-serif;
-  font-size: 1.35rem;
-}
-
-.transportDial input {
-  grid-column: 1 / 4;
-  width: 100%;
-}
-
-.historyControls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  padding: 8px;
-}
-
-.historyControls button {
-  display: grid;
-  place-items: center;
-  gap: 4px;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--paper);
-  font-size: 0.6rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  cursor: pointer;
-}
-
-.historyControls button + button {
-  border-left: 1px solid var(--line);
-  border-radius: 0 8px 8px 0;
-}
-
-.historyControls button:disabled {
-  color: #4c5148;
-  cursor: not-allowed;
-}
-
-.historyControls button > span {
-  font-size: 1.25rem;
-}
-
-.sequencer,
-.mixer,
-.performance,
 .clipDeck {
   border: 1px solid #34382f;
   border-radius: 14px;
   background: #0b0d0b;
-}
-
-.sequencer {
-  overflow: hidden;
 }
 
 .sectionHeading {
@@ -420,222 +293,6 @@
   letter-spacing: -0.04em;
 }
 
-.channelRail {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  padding: 1px;
-  border-bottom: 1px solid var(--line);
-  background: var(--line);
-}
-
-.channelRail button {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  gap: 2px 10px;
-  min-height: 56px;
-  padding: 10px 13px;
-  border: 0;
-  background: #10130f;
-  color: var(--muted);
-  text-align: left;
-  cursor: pointer;
-}
-
-.channelRail button > span {
-  grid-row: 1 / 3;
-  align-self: center;
-  color: var(--track-color);
-  font-size: 0.65rem;
-}
-
-.channelRail button strong {
-  color: var(--paper);
-  font-size: 0.7rem;
-  text-transform: uppercase;
-}
-
-.channelRail button small {
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.channelRail .selectedChannel {
-  background: color-mix(in srgb, var(--track-color), #10130f 88%);
-  box-shadow: inset 0 -3px var(--track-color);
-}
-
-.gridViewport {
-  overflow-x: auto;
-  padding: 20px 16px 16px;
-  scrollbar-color: var(--acid) #11140f;
-  scrollbar-width: thin;
-}
-
-.beatNumbers,
-.stepRow,
-.accentLane {
-  display: grid;
-  grid-template-columns: 44px repeat(16, minmax(34px, 1fr));
-  gap: 6px;
-  min-width: 780px;
-}
-
-.beatNumbers {
-  align-items: end;
-  margin-bottom: 7px;
-}
-
-.beatNumbers span {
-  color: #61675d;
-  font-size: 0.52rem;
-  text-align: center;
-}
-
-.beatNumbers span:nth-child(4n + 2) {
-  color: var(--paper);
-}
-
-.stepRows {
-  display: grid;
-  gap: 7px;
-}
-
-.rowCode {
-  display: grid;
-  min-height: 38px;
-  place-items: center;
-  border: 1px solid #363a31;
-  border-radius: 6px;
-  background: #11140f;
-  color: var(--track-color);
-  font-size: 0.58rem;
-}
-
-button.rowCode {
-  cursor: pointer;
-}
-
-.stepGrid,
-.accentGrid {
-  display: contents;
-}
-
-.stepButton,
-.accentGrid button {
-  position: relative;
-  min-width: 0;
-  min-height: 38px;
-  border: 1px solid #353a30;
-  border-radius: 6px;
-  background: #151914;
-  cursor: pointer;
-  transition: border-color 90ms ease, background 90ms ease, transform 90ms ease;
-}
-
-.stepButton:nth-child(4n + 1),
-.accentGrid button:nth-child(4n + 1) {
-  border-left-color: #747a6e;
-}
-
-.stepButton:hover,
-.stepButton:focus-visible {
-  border-color: var(--track-color);
-  transform: translateY(-1px);
-}
-
-.stepButton span,
-.accentGrid button span {
-  position: absolute;
-  inset: 7px;
-  border-radius: 3px;
-  background: #252a22;
-}
-
-.stepActive {
-  border-color: color-mix(in srgb, var(--track-color), white 16%);
-  background: color-mix(in srgb, var(--track-color), #0c0e0b 68%);
-}
-
-.stepActive span {
-  background: var(--track-color);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--track-color), transparent 45%);
-}
-
-.stepAccent span::after {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
-  background: #fff;
-  content: "";
-}
-
-.stepCurrent::before {
-  position: absolute;
-  z-index: 2;
-  top: -6px;
-  right: -3px;
-  bottom: -6px;
-  left: -3px;
-  border: 1px solid var(--acid);
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(210, 255, 55, 0.34);
-  content: "";
-  pointer-events: none;
-}
-
-.accentLane {
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px dashed #30342c;
-}
-
-.accentLane > .rowCode {
-  border-style: dashed;
-}
-
-.accentGrid button {
-  min-height: 22px;
-  border-style: dashed;
-}
-
-.accentGrid button span {
-  inset: 6px 10px;
-}
-
-.accentGrid button:disabled {
-  opacity: 0.32;
-  cursor: not-allowed;
-}
-
-.accentGrid .accentActive span {
-  background: var(--track-color);
-}
-
-.sequenceFooter {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 13px 16px;
-  border-top: 1px solid var(--line);
-  background: #10130f;
-}
-
-.sequenceFooter p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.58rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-}
-
-.sequenceFooter button,
 .clipActions button,
 .renderButton,
 .releaseStage button,
@@ -655,7 +312,6 @@ button.rowCode {
   cursor: pointer;
 }
 
-.sequenceFooter button:hover,
 .clipActions button:hover,
 .releaseStage button:hover,
 .releaseStage a:hover,
@@ -665,250 +321,8 @@ button.rowCode {
   color: var(--acid);
 }
 
-.mixStage {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
-  gap: 14px;
-}
-
 .clipDeck {
   grid-column: 1 / 3;
-}
-
-.channelStrips {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-  padding: 12px;
-}
-
-.trackStrip {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #10130f;
-}
-
-.selectedTrack {
-  border-color: var(--track-color);
-  box-shadow: inset 3px 0 var(--track-color);
-}
-
-.trackSelect {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.trackSelect > span:last-child {
-  display: grid;
-  gap: 3px;
-}
-
-.trackSelect strong {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-}
-
-.trackSelect small {
-  color: var(--muted);
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-}
-
-.trackLed {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: var(--track-color);
-  box-shadow: 0 0 11px color-mix(in srgb, var(--track-color), transparent 38%);
-}
-
-.trackButtons {
-  display: flex;
-  gap: 5px;
-}
-
-.trackButtons button {
-  width: 34px;
-  height: 34px;
-  border: 1px solid #40453a;
-  border-radius: 5px;
-  background: #0b0d0a;
-  color: var(--muted);
-  cursor: pointer;
-}
-
-.trackButtons .controlOn {
-  border-color: var(--track-color);
-  background: var(--track-color);
-  color: #080a07;
-}
-
-.volumeControl {
-  display: grid;
-  grid-column: 1 / 3;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 8px;
-}
-
-.volumeControl span,
-.volumeControl output {
-  color: var(--muted);
-  font-size: 0.52rem;
-  text-transform: uppercase;
-}
-
-.volumeControl input {
-  min-width: 0;
-}
-
-.performance {
-  padding-bottom: 12px;
-}
-
-.soundControls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 12px;
-}
-
-.instrumentControl,
-.effectControl {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 9px;
-  min-height: 72px;
-  padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #10130f;
-}
-
-.instrumentControl {
-  grid-column: 1 / 3;
-}
-
-.instrumentControl span,
-.effectControl span {
-  color: var(--muted);
-  font-size: 0.56rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.instrumentControl select {
-  min-height: 38px;
-  padding: 0 10px;
-  border: 1px solid var(--track-color);
-  border-radius: 5px;
-  background: #0b0e0a;
-  color: var(--paper);
-}
-
-.effectControl input {
-  grid-column: 1 / 3;
-  width: 100%;
-}
-
-.effectControl output {
-  color: var(--track-color);
-  font-family: var(--font-display), sans-serif;
-}
-
-.pads {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 7px;
-  padding: 0 12px 12px;
-}
-
-.pads button {
-  display: grid;
-  gap: 18px;
-  min-height: 86px;
-  padding: 10px;
-  border: 1px solid #444a3d;
-  border-radius: 9px;
-  background: linear-gradient(145deg, #1b2019, #10130f);
-  color: var(--paper);
-  text-align: left;
-  cursor: pointer;
-}
-
-.pads button:hover,
-.pads button:active {
-  border-color: var(--acid);
-  background: var(--acid);
-  color: #070906;
-}
-
-.pads span {
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
-}
-
-.pads strong {
-  font-family: var(--font-display), sans-serif;
-  font-size: 0.72rem;
-  text-transform: uppercase;
-}
-
-.masterPanel {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  align-items: center;
-  gap: 14px;
-  margin: 0 12px;
-  padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #080a08;
-}
-
-.masterPanel > div:first-child {
-  display: grid;
-  gap: 4px;
-}
-
-.masterPanel span,
-.masterPanel small {
-  font-size: 0.54rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.masterPanel small {
-  color: var(--muted);
-}
-
-.meter {
-  display: grid;
-  grid-template-columns: repeat(14, 1fr);
-  gap: 3px;
-}
-
-.meter i {
-  height: 18px;
-  border-radius: 2px;
-  background: #252a22;
-}
-
-.meter .meterOn {
-  background: var(--acid);
-  box-shadow: 0 0 8px rgba(210, 255, 55, 0.35);
 }
 
 .clipPanel {
@@ -1335,19 +749,6 @@ button.rowCode {
     display: none;
   }
 
-  .transport {
-    grid-template-columns: 1.25fr 1fr 1fr;
-  }
-
-  .historyControls {
-    grid-column: 1 / 4;
-    min-height: 56px;
-  }
-
-  .mixStage {
-    grid-template-columns: 1fr;
-  }
-
   .clipDeck {
     grid-column: 1;
   }
@@ -1408,27 +809,9 @@ button.rowCode {
   }
 
   .makeStage,
-  .mixStage,
   .finishPanel,
   .boardPlaceholder {
     padding: 10px;
-  }
-
-  .transport {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .playButton {
-    grid-column: 1 / 3;
-    min-height: 78px;
-  }
-
-  .transportDial {
-    min-height: 82px;
-  }
-
-  .historyControls {
-    grid-column: 1 / 3;
   }
 
   .sectionHeading {
@@ -1437,30 +820,11 @@ button.rowCode {
     min-height: 74px;
   }
 
-  .channelRail {
-    grid-template-columns: repeat(4, minmax(112px, 1fr));
-    overflow-x: auto;
-  }
-
-  .gridViewport {
-    padding-inline: 10px;
-  }
-
-  .beatNumbers,
-  .stepRow,
-  .accentLane {
-    grid-template-columns: 38px repeat(16, 36px);
-    min-width: 704px;
-  }
-
-  .sequenceFooter,
   .finishPanelHeader {
     align-items: start;
     flex-direction: column;
   }
 
-  .channelStrips,
-  .soundControls,
   .finishFields,
   .artifactPanel,
   .clipEditor,
@@ -1468,15 +832,10 @@ button.rowCode {
     grid-template-columns: 1fr;
   }
 
-  .instrumentControl,
   .renderButton,
   .artifactPanel nav,
   .clipDeck {
     grid-column: 1;
-  }
-
-  .pads {
-    grid-template-columns: 1fr 1fr;
   }
 
   .clipEditor small {
@@ -1511,8 +870,4 @@ button.rowCode {
     animation: none;
   }
 
-  .stepButton,
-  .playButton {
-    transition: none;
-  }
 }
