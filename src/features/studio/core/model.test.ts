@@ -7,6 +7,8 @@ describe("createDemoProject", () => {
     const first = createDemoProject();
     const second = createDemoProject();
 
+    expect(first.version).toBe(3);
+    expect(first.clip).toBeNull();
     expect(first.tempo).toBe(118);
     expect(first.swing).toBe(0.12);
     expect(first.tracks.map((track) => track.id)).toEqual([

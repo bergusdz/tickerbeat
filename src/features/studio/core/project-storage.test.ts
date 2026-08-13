@@ -12,7 +12,7 @@ describe("project storage", () => {
 
   it("rejects malformed, unknown-version, and structurally invalid drafts", () => {
     expect(parseStoredProject("not json")).toBeNull();
-    expect(parseStoredProject(JSON.stringify({ version: 3, project: createDemoProject() }))).toBeNull();
+    expect(parseStoredProject(JSON.stringify({ version: 99, project: createDemoProject() }))).toBeNull();
     expect(
       parseStoredProject(
         JSON.stringify({
@@ -38,8 +38,20 @@ describe("project storage", () => {
     }));
 
     expect(migrated?.tempo).toBe(126);
+    expect(migrated).toMatchObject({ version: 3, clip: null });
     expect(migrated?.tracks.every((track) => typeof track.instrument === "number")).toBe(true);
     expect(migrated?.tracks.every((track) => typeof track.filter === "number")).toBe(true);
     expect(migrated?.tracks.every((track) => typeof track.echo === "number")).toBe(true);
+  });
+
+  it("migrates a version-2 draft to a clip-free V3 snapshot", () => {
+    const current = createDemoProject();
+    const { version: _version, clip: _clip, ...versionTwo } = current;
+
+    expect(parseStoredProject(JSON.stringify({ version: 2, project: versionTwo }))).toEqual({
+      ...versionTwo,
+      version: 3,
+      clip: null,
+    });
   });
 });

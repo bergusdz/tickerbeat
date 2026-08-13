@@ -1,10 +1,18 @@
-import { createDemoProject, type Step, type StudioProject, type Track, type TrackId } from "./model";
+import {
+  createDemoProject,
+  type ClipReference,
+  type Step,
+  type StudioProject,
+  type Track,
+  type TrackId,
+} from "./model";
 
-export const PROJECT_STORAGE_KEY = "tickerbeat.project.v2";
+export const PROJECT_STORAGE_KEY = "tickerbeat.project.v3";
 export const LEGACY_PROJECT_STORAGE_KEY = "tickerbeat.project.v1";
 
 type LegacyTrack = Omit<Track, "instrument" | "filter" | "echo">;
-type LegacyProject = Omit<StudioProject, "tracks"> & { tracks: LegacyTrack[] };
+type ProjectV2 = Omit<StudioProject, "version" | "clip">;
+type ProjectV1 = Omit<ProjectV2, "tracks"> & { tracks: LegacyTrack[] };
 
 const TRACK_IDS = new Set<TrackId>(["drums", "bass", "chords", "lead"]);
 
@@ -59,10 +67,35 @@ function isTrack(value: unknown): value is Track {
   );
 }
 
+function isClipReference(value: unknown): value is ClipReference {
+  return (
+    isRecord(value) &&
+    typeof value.assetId === "string" &&
+    value.assetId.length > 0 &&
+    typeof value.sha256 === "string" &&
+    /^[a-f0-9]{64}$/.test(value.sha256) &&
+    typeof value.name === "string" &&
+    value.name.length > 0 &&
+    typeof value.mimeType === "string" &&
+    value.mimeType.startsWith("audio/") &&
+    Number.isInteger(value.size) &&
+    Number(value.size) > 0 &&
+    (value.source === "microphone" || value.source === "file") &&
+    typeof value.level === "number" &&
+    value.level >= 0 &&
+    value.level <= 1 &&
+    typeof value.trimStart === "number" &&
+    value.trimStart >= 0 &&
+    typeof value.trimEnd === "number" &&
+    value.trimEnd >= 0 &&
+    value.trimEnd >= value.trimStart
+  );
+}
+
 function isProjectShape(
   value: unknown,
   trackGuard: (track: unknown) => boolean,
-): value is LegacyProject | StudioProject {
+): value is ProjectV1 | ProjectV2 | StudioProject {
   if (!isRecord(value) || !Array.isArray(value.tracks) || value.tracks.length !== 4) return false;
   const ids = new Set(value.tracks.filter(trackGuard).map((track) => (track as LegacyTrack).id));
   return (
@@ -80,10 +113,14 @@ function isProjectShape(
   );
 }
 
-function migrateLegacyProject(project: LegacyProject): StudioProject {
+function migrateLegacyProject(project: ProjectV1): StudioProject {
   const defaults = new Map(createDemoProject().tracks.map((track) => [track.id, track]));
   return {
-    ...project,
+    version: 3,
+    title: project.title,
+    tempo: project.tempo,
+    swing: project.swing,
+    clip: null,
     tracks: project.tracks.map((track) => {
       const fallback = defaults.get(track.id)!;
       return {
@@ -96,8 +133,12 @@ function migrateLegacyProject(project: LegacyProject): StudioProject {
   };
 }
 
+function migrateVersionTwo(project: ProjectV2): StudioProject {
+  return { ...project, version: 3, clip: null };
+}
+
 export function serializeProject(project: StudioProject): string {
-  return JSON.stringify({ version: 2, project });
+  return JSON.stringify({ version: 3, project });
 }
 
 export function parseStoredProject(raw: string | null): StudioProject | null {
@@ -106,11 +147,20 @@ export function parseStoredProject(raw: string | null): StudioProject | null {
   try {
     const stored: unknown = JSON.parse(raw);
     if (!isRecord(stored)) return null;
-    if (stored.version === 2 && isProjectShape(stored.project, isTrack)) {
+    if (
+      stored.version === 3 &&
+      isProjectShape(stored.project, isTrack) &&
+      (stored.project as Record<string, unknown>).version === 3 &&
+      ((stored.project as Record<string, unknown>).clip === null ||
+        isClipReference((stored.project as Record<string, unknown>).clip))
+    ) {
       return stored.project as StudioProject;
     }
+    if (stored.version === 2 && isProjectShape(stored.project, isTrack)) {
+      return migrateVersionTwo(stored.project as ProjectV2);
+    }
     if (stored.version === 1 && isProjectShape(stored.project, isLegacyTrack)) {
-      return migrateLegacyProject(stored.project as LegacyProject);
+      return migrateLegacyProject(stored.project as ProjectV1);
     }
     return null;
   } catch {
