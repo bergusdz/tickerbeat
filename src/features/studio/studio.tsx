@@ -313,6 +313,8 @@ export function Studio() {
                           key={index}
                           type="button"
                           className={`${styles.stepButton} ${step.active ? styles.stepActive : ""} ${
+                            step.active && step.velocity >= 0.9 ? styles.stepAccent : ""
+                          } ${
                             isPlaying && currentStep === index ? styles.stepCurrent : ""
                           }`}
                           aria-label={`${track.label} step ${index + 1}`}
@@ -328,8 +330,35 @@ export function Studio() {
               })}
             </div>
 
+            <div
+              className={styles.accentLane}
+              style={{ "--track-color": activeTrack.color } as CSSProperties}
+            >
+              <span className={styles.rowCode}>AC</span>
+              <div className={styles.accentGrid}>
+                {activeTrack.steps.map((step, index) => {
+                  const accented = step.active && step.velocity >= 0.9;
+                  return (
+                    <button
+                      key={index}
+                      type="button"
+                      aria-label={`${activeTrack.label} accent step ${index + 1}`}
+                      aria-pressed={accented}
+                      disabled={!step.active}
+                      className={accented ? styles.accentActive : ""}
+                      onClick={() =>
+                        edit({ type: "toggle-accent", trackId: activeTrack.id, step: index })
+                      }
+                    >
+                      <span />
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className={styles.sequenceFooter}>
-              <span>ACTIVE CHANNEL</span>
+              <span>ACCENT CHANNEL</span>
               <strong style={{ color: activeTrack.color }}>{activeTrack.label.toUpperCase()}</strong>
               <button
                 type="button"

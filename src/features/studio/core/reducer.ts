@@ -3,6 +3,7 @@ import type { InstrumentPreset, StudioProject, Track, TrackId } from "./model";
 export type ProjectAction =
   | { type: "set-title"; value: string }
   | { type: "toggle-step"; trackId: TrackId; step: number }
+  | { type: "toggle-accent"; trackId: TrackId; step: number }
   | { type: "set-tempo"; value: number }
   | { type: "set-swing"; value: number }
   | { type: "set-volume"; trackId: TrackId; value: number }
@@ -47,9 +48,28 @@ export function reduceProject(project: StudioProject, action: ProjectAction): St
       return updateTrack(project, action.trackId, (track) => ({
         ...track,
         steps: track.steps.map((step, index) =>
-          index === action.step ? { ...step, active: !step.active } : step,
+          index === action.step
+            ? { ...step, active: !step.active, velocity: step.active ? step.velocity : 0.78 }
+            : step,
         ),
       }));
+
+    case "toggle-accent":
+      if (!Number.isInteger(action.step) || action.step < 0 || action.step >= 16) {
+        return project;
+      }
+      return updateTrack(project, action.trackId, (track) => {
+        const selectedStep = track.steps[action.step];
+        if (!selectedStep?.active) return track;
+        return {
+          ...track,
+          steps: track.steps.map((step, index) =>
+            index === action.step
+              ? { ...step, velocity: step.velocity >= 0.9 ? 0.78 : 1 }
+              : step,
+          ),
+        };
+      });
 
     case "set-tempo": {
       const tempo = clamp(Math.round(action.value), 70, 170);

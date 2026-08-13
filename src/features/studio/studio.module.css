@@ -852,6 +852,11 @@
   box-shadow: 0 0 10px var(--track-color);
 }
 
+.stepButton.stepAccent span {
+  inset: 21%;
+  box-shadow: 0 0 15px var(--track-color), 0 0 3px white;
+}
+
 .stepButton.stepCurrent::after {
   position: absolute;
   right: 3px;
@@ -861,6 +866,64 @@
   background: var(--paper);
   content: "";
   box-shadow: 0 0 8px white;
+}
+
+.accentLane {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  align-items: center;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.accentGrid {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(22px, 1fr));
+  gap: 4px;
+}
+
+.accentGrid button {
+  position: relative;
+  min-width: 0;
+  height: 11px;
+  padding: 0;
+  border: 1px solid #34372f;
+  border-radius: 999px;
+  background: #141612;
+}
+
+.accentGrid button:nth-child(4n + 1) {
+  margin-left: 4px;
+}
+
+.accentGrid button:first-child {
+  margin-left: 0;
+}
+
+.accentGrid button:disabled {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.accentGrid button:not(:disabled) {
+  cursor: pointer;
+}
+
+.accentGrid button span {
+  position: absolute;
+  inset: 3px;
+  border-radius: inherit;
+  background: #42463d;
+}
+
+.accentGrid button.accentActive {
+  border-color: var(--track-color);
+  background: color-mix(in srgb, var(--track-color), #11130f 82%);
+}
+
+.accentGrid button.accentActive span {
+  background: var(--track-color);
+  box-shadow: 0 0 8px var(--track-color);
 }
 
 .sequenceFooter {
@@ -1406,6 +1469,7 @@
 
   .beatNumbers,
   .stepRows,
+  .accentLane,
   .sequenceFooter {
     min-width: 590px;
   }

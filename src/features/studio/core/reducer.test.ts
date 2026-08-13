@@ -26,6 +26,36 @@ describe("reduceProject", () => {
     expect(project.tracks[1].steps[2].active).toBe(previous);
   });
 
+  it("toggles the accent of an active step without changing its gate", () => {
+    const project = createDemoProject();
+    const accented = reduceProject(project, {
+      type: "toggle-accent",
+      trackId: "bass",
+      step: 3,
+    });
+    const restored = reduceProject(accented, {
+      type: "toggle-accent",
+      trackId: "bass",
+      step: 3,
+    });
+
+    expect(project.tracks[1].steps[3]).toEqual({ active: true, velocity: 0.78 });
+    expect(accented.tracks[1].steps[3]).toEqual({ active: true, velocity: 1 });
+    expect(restored.tracks[1].steps[3]).toEqual({ active: true, velocity: 0.78 });
+    expect(project.tracks[1].steps[3].velocity).toBe(0.78);
+  });
+
+  it("ignores accent edits for inactive or invalid steps", () => {
+    const project = createDemoProject();
+
+    expect(
+      reduceProject(project, { type: "toggle-accent", trackId: "drums", step: 1 }),
+    ).toBe(project);
+    expect(
+      reduceProject(project, { type: "toggle-accent", trackId: "drums", step: 16 }),
+    ).toBe(project);
+  });
+
   it("returns the same project for an invalid step index", () => {
     const project = createDemoProject();
 

@@ -44,6 +44,18 @@ describe("Studio", () => {
     expect(step).toHaveAttribute("aria-pressed", "true");
   });
 
+  it("adds and removes an accent on the selected channel", () => {
+    render(<Studio />);
+    const accent = screen.getByRole("button", { name: "Drums accent step 1" });
+
+    expect(accent).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(accent);
+    expect(accent).toHaveAttribute("aria-pressed", "false");
+    fireEvent.click(accent);
+    expect(accent).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Drums accent step 2" })).toBeDisabled();
+  });
+
   it("updates the tempo display", () => {
     render(<Studio />);
 
