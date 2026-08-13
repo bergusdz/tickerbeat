@@ -1,5 +1,7 @@
 import type {
   FeedbackDelay,
+  Filter,
+  Gain,
   Limiter,
   MembraneSynth,
   MonoSynth,
@@ -10,6 +12,7 @@ import type {
 
 import type { StudioProject, TrackId } from "../core/model";
 import { eventsAtStep } from "../core/schedule";
+import { cutoffFrequency, drumProfile, echoSendGain, oscillatorType } from "./sound-design";
 
 type ToneModule = typeof import("tone");
 
@@ -32,6 +35,8 @@ export class ToneStudioEngine {
   private chords: PolySynth | null = null;
   private lead: Synth | null = null;
   private volumes: Record<TrackId, Volume> | null = null;
+  private filters: Record<TrackId, Filter> | null = null;
+  private sends: Record<TrackId, Gain> | null = null;
   private delay: FeedbackDelay | null = null;
   private limiter: Limiter | null = null;
 
@@ -59,10 +64,22 @@ export class ToneStudioEngine {
 
   update(project: StudioProject): void {
     this.project = project;
-    if (!this.tone || !this.volumes) return;
+    if (!this.tone || !this.volumes || !this.filters || !this.sends) return;
 
     for (const track of project.tracks) {
       this.volumes[track.id].volume.rampTo(track.volume, 0.05);
+      this.filters[track.id].frequency.rampTo(cutoffFrequency(track.filter), 0.05);
+      this.sends[track.id].gain.rampTo(echoSendGain(track.echo), 0.05);
+      if (track.id === "drums") {
+        const profile = drumProfile(track.instrument);
+        this.drums?.set({ pitchDecay: profile.pitchDecay, octaves: profile.octaves });
+      } else if (track.id === "bass") {
+        this.bass?.set({ oscillator: { type: oscillatorType("bass", track.instrument) } });
+      } else if (track.id === "chords") {
+        this.chords?.set({ oscillator: { type: oscillatorType("chords", track.instrument) } });
+      } else {
+        this.lead?.set({ oscillator: { type: oscillatorType("lead", track.instrument) } });
+      }
     }
   }
 
@@ -76,6 +93,8 @@ export class ToneStudioEngine {
     this.chords?.dispose();
     this.lead?.dispose();
     Object.values(this.volumes ?? {}).forEach((volume) => volume.dispose());
+    Object.values(this.filters ?? {}).forEach((filter) => filter.dispose());
+    Object.values(this.sends ?? {}).forEach((send) => send.dispose());
     this.delay?.dispose();
     this.limiter?.dispose();
 
@@ -91,21 +110,40 @@ export class ToneStudioEngine {
     this.delay = new tone.FeedbackDelay({
       delayTime: 0.24,
       feedback: 0.18,
-      wet: 0.12,
+      wet: 1,
     }).connect(this.limiter);
 
     this.volumes = {
-      drums: new tone.Volume(-4).connect(this.delay),
-      bass: new tone.Volume(-7).connect(this.delay),
-      chords: new tone.Volume(-12).connect(this.delay),
-      lead: new tone.Volume(-13).connect(this.delay),
+      drums: new tone.Volume(-4),
+      bass: new tone.Volume(-7),
+      chords: new tone.Volume(-12),
+      lead: new tone.Volume(-13),
     };
+    this.filters = {
+      drums: new tone.Filter({ type: "lowpass", frequency: 12_000, rolloff: -24 }),
+      bass: new tone.Filter({ type: "lowpass", frequency: 1_200, rolloff: -24 }),
+      chords: new tone.Filter({ type: "lowpass", frequency: 3_000, rolloff: -24 }),
+      lead: new tone.Filter({ type: "lowpass", frequency: 4_000, rolloff: -24 }),
+    };
+    this.sends = {
+      drums: new tone.Gain(0),
+      bass: new tone.Gain(0),
+      chords: new tone.Gain(0),
+      lead: new tone.Gain(0),
+    };
+
+    for (const trackId of ["drums", "bass", "chords", "lead"] as const) {
+      this.filters[trackId].connect(this.volumes[trackId]);
+      this.volumes[trackId].connect(this.limiter);
+      this.volumes[trackId].connect(this.sends[trackId]);
+      this.sends[trackId].connect(this.delay);
+    }
 
     this.drums = new tone.MembraneSynth({
       pitchDecay: 0.028,
       octaves: 7,
       envelope: { attack: 0.001, decay: 0.24, sustain: 0.01, release: 0.28 },
-    }).connect(this.volumes.drums);
+    }).connect(this.filters.drums);
 
     this.bass = new tone.MonoSynth({
       oscillator: { type: "sawtooth" },
@@ -119,17 +157,17 @@ export class ToneStudioEngine {
         baseFrequency: 90,
         octaves: 3.2,
       },
-    }).connect(this.volumes.bass);
+    }).connect(this.filters.bass);
 
     this.chords = new tone.PolySynth(tone.Synth, {
       oscillator: { type: "triangle" },
       envelope: { attack: 0.02, decay: 0.15, sustain: 0.25, release: 0.48 },
-    }).connect(this.volumes.chords);
+    }).connect(this.filters.chords);
 
     this.lead = new tone.Synth({
       oscillator: { type: "square" },
       envelope: { attack: 0.006, decay: 0.1, sustain: 0.12, release: 0.2 },
-    }).connect(this.volumes.lead);
+    }).connect(this.filters.lead);
 
     this.update(this.project);
   }
@@ -160,7 +198,7 @@ export class ToneStudioEngine {
     const duration = Math.max(0.04, stepDurationMs(this.project.tempo, 0, this.step) / 1_000 * 0.82);
     switch (trackId) {
       case "drums":
-        this.drums?.triggerAttackRelease("C1", duration, time, velocity);
+        this.drums?.triggerAttackRelease(note as string, duration, time, velocity);
         break;
       case "bass":
         this.bass?.triggerAttackRelease(note as string, duration, time, velocity);

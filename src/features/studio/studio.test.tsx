@@ -78,4 +78,26 @@ describe("Studio", () => {
     fireEvent.click(screen.getByRole("button", { name: "Play beat" }));
     expect(audio.togglePlayback).toHaveBeenCalledOnce();
   });
+
+  it("shapes the selected channel without changing the others", () => {
+    render(<Studio />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Select Bass track" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Bass instrument" }), {
+      target: { value: "2" },
+    });
+    fireEvent.change(screen.getByRole("slider", { name: "Bass filter" }), {
+      target: { value: "82" },
+    });
+    fireEvent.change(screen.getByRole("slider", { name: "Bass echo" }), {
+      target: { value: "36" },
+    });
+
+    expect(screen.getByRole("combobox", { name: "Bass instrument" })).toHaveValue("2");
+    expect(screen.getByRole("slider", { name: "Bass filter" })).toHaveValue("82");
+    expect(screen.getByRole("slider", { name: "Bass echo" })).toHaveValue("36");
+
+    fireEvent.click(screen.getByRole("button", { name: "Select Drums track" }));
+    expect(screen.getByRole("combobox", { name: "Drums instrument" })).toHaveValue("0");
+  });
 });

@@ -25,7 +25,13 @@ describe("project storage", () => {
 
   it("migrates a version-1 draft with sound-design defaults", () => {
     const legacy = createDemoProject();
-    const legacyTracks = legacy.tracks.map(({ instrument: _instrument, filter: _filter, echo: _echo, ...track }) => track);
+    const legacyTracks = legacy.tracks.map((track) => {
+      const versionOneTrack: Record<string, unknown> = { ...track };
+      delete versionOneTrack.instrument;
+      delete versionOneTrack.filter;
+      delete versionOneTrack.echo;
+      return versionOneTrack;
+    });
     const migrated = parseStoredProject(JSON.stringify({
       version: 1,
       project: { ...legacy, tempo: 126, tracks: legacyTracks },

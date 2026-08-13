@@ -13,6 +13,7 @@ import {
 import type { ProjectAction } from "./core/reducer";
 import styles from "./studio.module.css";
 import { useStudioAudio } from "./use-studio-audio";
+import { INSTRUMENT_LABELS } from "./audio/sound-design";
 import { SoundClipPanel } from "./recording/sound-clip-panel";
 import { useSoundClip } from "./recording/use-sound-clip";
 import { FinishPanel } from "./render/finish-panel";
@@ -345,6 +346,73 @@ export function Studio() {
               <span>03</span>
               <strong>PERFORM</strong>
             </div>
+            <section
+              className={styles.soundControls}
+              aria-label={`${activeTrack.label} sound controls`}
+              style={{ "--track-color": activeTrack.color } as CSSProperties}
+            >
+              <div className={styles.soundControlHeader}>
+                <span>SELECTED CHANNEL</span>
+                <strong>{activeTrack.label.toUpperCase()}</strong>
+              </div>
+
+              <label className={styles.instrumentControl}>
+                <span>VOICE</span>
+                <select
+                  aria-label={`${activeTrack.label} instrument`}
+                  value={activeTrack.instrument}
+                  onChange={(event) =>
+                    edit({
+                      type: "set-instrument",
+                      trackId: activeTrack.id,
+                      value: Number(event.target.value),
+                    })
+                  }
+                >
+                  {INSTRUMENT_LABELS[activeTrack.id].map((label, index) => (
+                    <option key={label} value={index}>{label}</option>
+                  ))}
+                </select>
+              </label>
+
+              <label className={styles.effectControl}>
+                <span>FILTER</span>
+                <input
+                  aria-label={`${activeTrack.label} filter`}
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={Math.round(activeTrack.filter * 100)}
+                  onChange={(event) =>
+                    edit({
+                      type: "set-filter",
+                      trackId: activeTrack.id,
+                      value: Number(event.target.value) / 100,
+                    })
+                  }
+                />
+                <output>{Math.round(activeTrack.filter * 100)}</output>
+              </label>
+
+              <label className={styles.effectControl}>
+                <span>ECHO</span>
+                <input
+                  aria-label={`${activeTrack.label} echo`}
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={Math.round(activeTrack.echo * 100)}
+                  onChange={(event) =>
+                    edit({
+                      type: "set-echo",
+                      trackId: activeTrack.id,
+                      value: Number(event.target.value) / 100,
+                    })
+                  }
+                />
+                <output>{Math.round(activeTrack.echo * 100)}</output>
+              </label>
+            </section>
             <SoundClipPanel control={soundClip} />
             <div className={styles.pads}>
               {[0, 4, 8, 12].map((step, index) => (

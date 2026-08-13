@@ -1,6 +1,7 @@
-import type { StudioProject, TrackId } from "../core/model";
+import type { StudioProject, Track, TrackId } from "../core/model";
 import { eventsAtStep } from "../core/schedule";
 import { stepDurationMs } from "../audio/tone-engine";
+import { cutoffFrequency, drumProfile, echoSendGain, oscillatorType } from "../audio/sound-design";
 import { audioBufferToWav, projectDurationSeconds } from "./render-utils";
 
 const SEMITONES: Record<string, number> = {
@@ -48,10 +49,11 @@ function scheduleVoice(
   duration: number,
   velocity: number,
   trackGain: number,
+  waveform: OscillatorType,
 ): void {
   const oscillator = context.createOscillator();
   const envelope = context.createGain();
-  oscillator.type = trackId === "bass" ? "sawtooth" : trackId === "chords" ? "triangle" : "square";
+  oscillator.type = waveform;
   oscillator.frequency.setValueAtTime(frequency, start);
   envelope.gain.setValueAtTime(0.0001, start);
   envelope.gain.exponentialRampToValueAtTime(Math.max(0.0001, velocity * trackGain), start + 0.008);
@@ -67,17 +69,45 @@ function scheduleDrum(
   start: number,
   velocity: number,
   trackGain: number,
+  instrument: Track["instrument"],
 ): void {
   const oscillator = context.createOscillator();
   const envelope = context.createGain();
+  const profile = drumProfile(instrument);
   oscillator.type = "sine";
-  oscillator.frequency.setValueAtTime(135, start);
-  oscillator.frequency.exponentialRampToValueAtTime(43, start + 0.16);
+  oscillator.frequency.setValueAtTime(profile.startFrequency, start);
+  oscillator.frequency.exponentialRampToValueAtTime(profile.endFrequency, start + profile.decay * 0.8);
   envelope.gain.setValueAtTime(Math.max(0.0001, velocity * trackGain), start);
-  envelope.gain.exponentialRampToValueAtTime(0.0001, start + 0.2);
+  envelope.gain.exponentialRampToValueAtTime(0.0001, start + profile.decay);
   oscillator.connect(envelope).connect(output);
   oscillator.start(start);
-  oscillator.stop(start + 0.22);
+  oscillator.stop(start + profile.decay + 0.02);
+}
+
+function createTrackBuses(
+  context: OfflineAudioContext,
+  project: StudioProject,
+  dryOutput: AudioNode,
+): Record<TrackId, BiquadFilterNode> {
+  const delay = context.createDelay(1);
+  const feedback = context.createGain();
+  delay.delayTime.value = 0.24;
+  feedback.gain.value = 0.18;
+  delay.connect(feedback);
+  feedback.connect(delay);
+  delay.connect(dryOutput);
+
+  return Object.fromEntries(project.tracks.map((track) => {
+    const filter = context.createBiquadFilter();
+    const send = context.createGain();
+    filter.type = "lowpass";
+    filter.frequency.value = cutoffFrequency(track.filter);
+    send.gain.value = echoSendGain(track.echo);
+    filter.connect(dryOutput);
+    filter.connect(send);
+    send.connect(delay);
+    return [track.id, filter];
+  })) as Record<TrackId, BiquadFilterNode>;
 }
 
 export async function renderProjectToWav(
@@ -98,6 +128,7 @@ export async function renderProjectToWav(
   compressor.attack.value = 0.003;
   compressor.release.value = 0.16;
   compressor.connect(context.destination);
+  const trackBuses = createTrackBuses(context, project, compressor);
 
   const starts = stepStartTimes(project);
   for (let step = 0; step < 16; step += 1) {
@@ -107,7 +138,14 @@ export async function renderProjectToWav(
       const track = project.tracks.find((candidate) => candidate.id === event.trackId);
       const trackGain = dbToGain(track?.volume ?? -12) * 0.32;
       if (event.trackId === "drums") {
-        scheduleDrum(context, compressor, start, event.velocity, trackGain);
+        scheduleDrum(
+          context,
+          trackBuses.drums,
+          start,
+          event.velocity,
+          trackGain,
+          track?.instrument ?? 0,
+        );
         continue;
       }
 
@@ -115,13 +153,14 @@ export async function renderProjectToWav(
       for (const note of notes) {
         scheduleVoice(
           context,
-          compressor,
+          trackBuses[event.trackId],
           event.trackId,
           noteToFrequency(note),
           start,
           event.trackId === "chords" ? noteDuration * 1.8 : noteDuration,
           event.velocity / Math.sqrt(notes.length),
           trackGain,
+          oscillatorType(event.trackId, track?.instrument ?? 0),
         );
       }
     }
