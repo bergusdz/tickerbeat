@@ -1,9 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { IDBFactory } from "fake-indexeddb";
+import { Blob as NodeBlob } from "node:buffer";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { Studio } from "./studio";
 import { createDemoProject } from "./core/model";
 import { PROJECT_STORAGE_KEY, serializeProject } from "./core/project-storage";
+import { createClipReference } from "./recording/clip-reference";
+import { IndexedDbClipAssetStore } from "./recording/indexeddb-clip-store";
 
 const audio = vi.hoisted(() => ({
   togglePlayback: vi.fn(),
@@ -24,6 +28,7 @@ describe("Studio", () => {
       createObjectURL: vi.fn(() => "blob:studio-test"),
       revokeObjectURL: vi.fn(),
     });
+    vi.stubGlobal("indexedDB", new IDBFactory());
   });
 
   it("renders all four instrument tracks", () => {
@@ -78,6 +83,20 @@ describe("Studio", () => {
     expect(await screen.findByText("SAVED PULSE")).toBeInTheDocument();
   });
 
+  it("restores a content-addressed clip with its draft", async () => {
+    const blob = new NodeBlob(["sample"], { type: "audio/wav" }) as unknown as Blob;
+    const clip = await createClipReference(blob, "restored.wav", "file");
+    await new IndexedDbClipAssetStore(indexedDB).put(clip, blob);
+    localStorage.setItem(
+      PROJECT_STORAGE_KEY,
+      serializeProject({ ...createDemoProject(), clip }),
+    );
+
+    render(<Studio />);
+
+    expect(await screen.findByText("restored.wav")).toBeInTheDocument();
+  });
+
   it("clears and restores the active track", () => {
     render(<Studio />);
     const firstStep = screen.getByRole("button", { name: "Drums step 1" });
@@ -101,6 +120,7 @@ describe("Studio", () => {
     render(<Studio />);
 
     fireEvent.click(screen.getByRole("button", { name: "Select Bass track" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Mix" }));
     fireEvent.change(screen.getByRole("combobox", { name: "Bass instrument" }), {
       target: { value: "2" },
     });
@@ -119,15 +139,16 @@ describe("Studio", () => {
     expect(screen.getByRole("combobox", { name: "Drums instrument" })).toHaveValue("0");
   });
 
-  it("trims and levels an imported sample clip", () => {
+  it("trims and levels an imported sample clip", async () => {
     render(<Studio />);
+    fireEvent.click(screen.getByRole("tab", { name: "Mix" }));
     fireEvent.change(screen.getByLabelText("Import an audio clip"), {
       target: {
         files: [new File(["sample"], "signal.wav", { type: "audio/wav" })],
       },
     });
 
-    expect(screen.getByRole("button", { name: "Preview sample clip" })).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: "Preview sample clip" })).toBeInTheDocument();
     expect(screen.getByRole("slider", { name: "Clip start" })).toHaveValue("0");
     expect(screen.getByRole("slider", { name: "Clip end" })).toHaveValue("100");
     expect(screen.getByRole("slider", { name: "Clip level" })).toHaveValue("70");

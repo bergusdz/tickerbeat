@@ -20,11 +20,25 @@ export type Track = {
   steps: Step[];
 };
 
+export type ClipReference = {
+  assetId: string;
+  sha256: string;
+  name: string;
+  mimeType: string;
+  size: number;
+  source: "microphone" | "file";
+  level: number;
+  trimStart: number;
+  trimEnd: number;
+};
+
 export type StudioProject = {
+  version: 3;
   title: string;
   tempo: number;
   swing: number;
   tracks: Track[];
+  clip: ClipReference | null;
 };
 
 const STEP_COUNT = 16;
@@ -40,9 +54,11 @@ function createSteps(activeSteps: number[]): Step[] {
 
 export function createDemoProject(): StudioProject {
   return {
+    version: 3,
     title: "Acid Broadcast 001",
     tempo: 118,
     swing: 0.12,
+    clip: null,
     tracks: [
       {
         id: "drums",

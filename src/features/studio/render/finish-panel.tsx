@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { StudioProject } from "../core/model";
-import type { SoundClip } from "../recording/use-sound-clip";
+import { serializeProject } from "../core/project-storage";
+import type { SoundClip } from "../recording/types";
 import styles from "../studio.module.css";
-import { PublishPanel } from "../../publication/publish-panel";
+import { ReleaseShell } from "../../release/release-shell";
 import type { PublishableArtifact } from "../../publication/types";
 import { decodeAudioBlob, renderProjectToWav } from "./render-project";
 import { createCoverSvg } from "./render-utils";
@@ -62,7 +63,7 @@ export function FinishPanel({
         : undefined;
       const audio = await renderProjectToWav(finalized, decodedClip);
       const cover = createCoverSvg(finalized);
-      const projectFile = new Blob([JSON.stringify({ version: 2, project: finalized }, null, 2)], {
+      const projectFile = new Blob([serializeProject(finalized)], {
         type: "application/json",
       });
       setArtifact({
@@ -160,7 +161,7 @@ export function FinishPanel({
       </div>
 
       {currentArtifact ? (
-        <PublishPanel key={currentArtifact.projectUrl} artifact={currentArtifact} />
+        <ReleaseShell key={currentArtifact.projectUrl} artifact={currentArtifact} />
       ) : null}
     </section>
   );

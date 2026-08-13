@@ -6,9 +6,16 @@ export type BoardRelease = {
   audioUrl: string | null;
   metadataUrl: string | null;
   deployedAt: string | null;
+  creator: `0x${string}`;
+  transactionHash: `0x${string}`;
+  blockNumber: string;
 };
 
 export type ClankerApiToken = {
+  admin?: string;
+  msg_sender?: string;
+  tx_hash?: string;
+  factory_address?: string;
   contract_address?: string;
   name?: string;
   symbol?: string;

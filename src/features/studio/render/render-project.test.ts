@@ -1,24 +1,45 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { createDemoProject } from "../core/model";
-import { noteToFrequency, stepStartTimes } from "./render-project";
+import { createSoundPlan } from "../core/sound-plan";
+import { createToneGraph, scheduleTonePlan } from "../audio/tone-graph";
+import { renderProjectToWav } from "./render-project";
 
-describe("noteToFrequency", () => {
-  it("maps equal-tempered notes to hertz", () => {
-    expect(noteToFrequency("A4")).toBeCloseTo(440, 5);
-    expect(noteToFrequency("C4")).toBeCloseTo(261.626, 3);
-    expect(noteToFrequency("Ab3")).toBeCloseTo(207.652, 3);
+const mocks = vi.hoisted(() => ({
+  offline: vi.fn(),
+  graph: { dispose: vi.fn() },
+}));
+
+vi.mock("tone", () => ({ Offline: mocks.offline }));
+vi.mock("../audio/tone-graph", () => ({
+  createToneGraph: vi.fn(() => mocks.graph),
+  scheduleTonePlan: vi.fn(),
+}));
+
+describe("renderProjectToWav", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.offline.mockImplementation(async (callback: () => void) => {
+      callback();
+      return {
+        numberOfChannels: 2,
+        length: 2,
+        sampleRate: 44_100,
+        getChannelData: () => new Float32Array(2),
+      };
+    });
   });
-});
 
-describe("stepStartTimes", () => {
-  it("preserves swung timing without changing bar length", () => {
-    const project = { ...createDemoProject(), tempo: 120, swing: 0.2 };
-    const starts = stepStartTimes(project);
+  it("renders the canonical SoundPlan through Tone.Offline", async () => {
+    const project = createDemoProject();
+    const plan = createSoundPlan(project);
 
-    expect(starts).toHaveLength(16);
-    expect(starts[0]).toBe(0);
-    expect(starts[1]).toBeCloseTo(0.15, 5);
-    expect(starts[2]).toBeCloseTo(0.25, 5);
+    const wav = await renderProjectToWav(project);
+
+    expect(mocks.offline).toHaveBeenCalledWith(expect.any(Function), plan.durationSeconds, 2, 44_100);
+    expect(createToneGraph).toHaveBeenCalledWith(expect.any(Object), plan);
+    expect(scheduleTonePlan).toHaveBeenCalledWith(mocks.graph, plan);
+    expect(mocks.graph.dispose).toHaveBeenCalledOnce();
+    expect(wav.type).toBe("audio/wav");
   });
 });

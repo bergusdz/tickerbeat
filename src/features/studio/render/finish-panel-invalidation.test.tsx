@@ -10,8 +10,8 @@ vi.mock("./render-project", () => ({
   renderProjectToWav: vi.fn(),
 }));
 
-vi.mock("../../publication/publish-panel", () => ({
-  PublishPanel: ({ artifact }: { artifact: { symbol: string } }) => (
+vi.mock("../../release/release-shell", () => ({
+  ReleaseShell: ({ artifact }: { artifact: { symbol: string } }) => (
     <div data-testid="publish-panel">{artifact.symbol}</div>
   ),
 }));

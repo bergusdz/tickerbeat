@@ -1,4 +1,4 @@
-import type { InstrumentPreset, StudioProject, Track, TrackId } from "./model";
+import type { ClipReference, InstrumentPreset, StudioProject, Track, TrackId } from "./model";
 
 export type ProjectAction =
   | { type: "set-title"; value: string }
@@ -12,6 +12,7 @@ export type ProjectAction =
   | { type: "set-echo"; trackId: TrackId; value: number }
   | { type: "toggle-mute"; trackId: TrackId }
   | { type: "toggle-solo"; trackId: TrackId }
+  | { type: "set-clip"; value: ClipReference | null }
   | { type: "clear-track"; trackId: TrackId };
 
 function clamp(value: number, minimum: number, maximum: number): number {
@@ -118,6 +119,9 @@ export function reduceProject(project: StudioProject, action: ProjectAction): St
         ...track,
         solo: !track.solo,
       }));
+
+    case "set-clip":
+      return action.value === project.clip ? project : { ...project, clip: action.value };
 
     case "clear-track":
       return updateTrack(project, action.trackId, (track) => {

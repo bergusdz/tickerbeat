@@ -13,6 +13,9 @@ const releases: BoardRelease[] = [
     audioUrl: "ipfs://audio-one",
     metadataUrl: "ipfs://metadata-one",
     deployedAt: "2026-08-13T00:00:00.000Z",
+    creator: "0x3333333333333333333333333333333333333333",
+    transactionHash: `0x${"1".repeat(64)}`,
+    blockNumber: "100",
   },
   {
     address: "0x2222222222222222222222222222222222222222",
@@ -22,6 +25,9 @@ const releases: BoardRelease[] = [
     audioUrl: "ipfs://audio-two",
     metadataUrl: "ipfs://metadata-two",
     deployedAt: "2026-08-13T01:00:00.000Z",
+    creator: "0x4444444444444444444444444444444444444444",
+    transactionHash: `0x${"2".repeat(64)}`,
+    blockNumber: "101",
   },
 ];
 

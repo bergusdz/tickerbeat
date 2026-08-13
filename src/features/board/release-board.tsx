@@ -19,8 +19,7 @@ export async function ReleaseBoard() {
         <div className={styles.empty}>
           <span>NO. 000</span>
           <strong>THE FIRST SLOT IS OPEN.</strong>
-          <p>Finish a loop above. The board fills only after a confirmed Base deployment.</p>
-          <a href="#studio">MAKE THE FIRST SOUND ↑</a>
+          <p>Open Make to compose it. The board fills only after a confirmed Base deployment.</p>
         </div>
       ) : <ReleaseGrid items={items} />}
     </section>

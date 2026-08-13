@@ -1,0 +1,127 @@
+.workspace {
+  position: relative;
+}
+
+.stageRail {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  padding: 1px;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
+  border-radius: 18px 18px 0 0;
+  background: var(--line-strong);
+}
+
+.stageRail button {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 2px 12px;
+  min-height: 72px;
+  padding: 14px 18px;
+  border: 0;
+  background: #10120f;
+  color: var(--muted);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.stageRail button::after {
+  position: absolute;
+  right: 18px;
+  bottom: 0;
+  left: 18px;
+  height: 3px;
+  background: var(--acid);
+  content: "";
+  opacity: 0;
+  transform: scaleX(0.25);
+  transform-origin: left;
+  transition: opacity 160ms ease, transform 220ms ease;
+}
+
+.stageRail button:hover,
+.stageRail button:focus-visible {
+  background: #171a15;
+  color: var(--paper);
+}
+
+.stageRail button:focus-visible {
+  z-index: 2;
+  outline: 2px solid var(--acid);
+  outline-offset: -3px;
+}
+
+.stageRail .activeStage {
+  background: #1b1e18;
+  color: var(--paper);
+}
+
+.stageRail .activeStage::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.stageRail span {
+  grid-row: 1 / 3;
+  align-self: center;
+  color: var(--acid);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+}
+
+.stageRail strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: clamp(1rem, 1.4vw, 1.22rem);
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.stageRail small {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.panelStack {
+  min-height: 480px;
+  border: 1px solid var(--line-strong);
+  border-top: 0;
+  border-radius: 0 0 22px 22px;
+  background: var(--machine);
+}
+
+.stagePanel[hidden] {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .stageRail {
+    grid-template-columns: repeat(4, minmax(118px, 1fr));
+    overflow-x: auto;
+    border-radius: 14px 14px 0 0;
+    scrollbar-width: none;
+  }
+
+  .stageRail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .stageRail button {
+    min-height: 62px;
+    padding: 11px 13px;
+  }
+
+  .stageRail button::after {
+    right: 13px;
+    left: 13px;
+  }
+
+  .panelStack {
+    border-radius: 0 0 16px 16px;
+  }
+}
+
