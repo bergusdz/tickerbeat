@@ -18,6 +18,7 @@ import type { PublicationReceipt, PublishableArtifact } from "@/features/publica
 
 import { getBaseWalletAfterSwitch } from "./base-wallet";
 import { createClankerTokenConfig } from "./clanker-config";
+import { assertClankerLaunchReceipt } from "./launch-receipt";
 import { assertReviewedLaunch } from "./launch-review";
 
 type LaunchState =
@@ -103,6 +104,9 @@ export function LaunchPanel({
   const deploy = async () => {
     if (!tokenConfig || launch.status !== "ready") return;
     try {
+      if (!connection.address) throw new Error("Reconnect the launch wallet.");
+      if (!publicClient) throw new Error("Base public client is not ready.");
+      const expectedCreator = connection.address;
       const expectedAddress = assertReviewedLaunch(
         launch.reviewedConfig,
         currentConfig,
@@ -118,13 +122,18 @@ export function LaunchPanel({
       const result = await client.deploy(tokenConfig, suffix ? { dataSuffix: suffix } : undefined);
       if ("error" in result && result.error) throw result.error;
       setLaunch({ status: "submitted", txHash: result.txHash });
-      const confirmed = await result.waitForTransaction();
-      if ("error" in confirmed && confirmed.error) throw confirmed.error;
-      setLaunch({ status: "confirmed", txHash: result.txHash, tokenAddress: confirmed.address });
+      const transactionReceipt = await publicClient.waitForTransactionReceipt({ hash: result.txHash });
+      if (transactionReceipt.status !== "success") throw new Error("Clanker deployment reverted on Base.");
+      const tokenAddress = assertClankerLaunchReceipt({
+        logs: transactionReceipt.logs,
+        expectedAddress,
+        expectedCreator,
+      });
+      setLaunch({ status: "confirmed", txHash: result.txHash, tokenAddress });
       void fetch("/api/clanker/index", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ address: confirmed.address }),
+        body: JSON.stringify({ address: tokenAddress }),
       });
     } catch (error) {
       setLaunch({ status: "error", message: error instanceof Error ? error.message : "Launch failed." });
