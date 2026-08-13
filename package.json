@@ -17,6 +17,7 @@
     "@tanstack/react-query": "5.101.4",
     "clanker-sdk": "4.2.18",
     "next": "16.3.0",
+    "ox": "^1.6.2",
     "pinata": "2.5.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",

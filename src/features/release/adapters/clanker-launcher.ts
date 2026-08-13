@@ -2,17 +2,13 @@ import { Clanker } from "clanker-sdk/v4";
 import type { Account, Chain, PublicClient, Transport, WalletClient } from "viem";
 
 import { createClankerTokenConfig } from "../../launch/clanker-config";
+import { builderCodeDataSuffix } from "../../launch/builder-code";
 import { assertClankerLaunchReceipt } from "../../launch/launch-receipt";
 import { assertPublicationCreator, assertReviewedLaunch } from "../../launch/launch-review";
 import type { LaunchInput, SubmittedLaunch, TokenLauncher } from "../core/ports";
 import type { ConfirmedLaunchReceipt, LaunchReviewReceipt } from "../core/release-session";
 
 type BaseWallet = WalletClient<Transport, Chain, Account>;
-
-function deploymentSuffix(): `0x${string}` | undefined {
-  const value = process.env.NEXT_PUBLIC_BASE_BUILDER_CODE_SUFFIX;
-  return value && /^0x(?:[0-9a-fA-F]{2})+$/.test(value) ? (value as `0x${string}`) : undefined;
-}
 
 export class ClankerTokenLauncher implements TokenLauncher {
   constructor(
@@ -55,7 +51,7 @@ export class ClankerTokenLauncher implements TokenLauncher {
   async submit(input: LaunchInput, review: LaunchReviewReceipt): Promise<SubmittedLaunch> {
     const config = this.config(input);
     assertReviewedLaunch(review.reviewedConfig, JSON.stringify(config), review.expectedAddress);
-    const suffix = deploymentSuffix();
+    const suffix = builderCodeDataSuffix(process.env.NEXT_PUBLIC_BASE_BUILDER_CODE);
     const result = await (await this.client()).deploy(config, suffix ? { dataSuffix: suffix } : undefined);
     if ("error" in result && result.error) throw result.error;
     return { txHash: result.txHash };
