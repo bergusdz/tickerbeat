@@ -16,6 +16,7 @@ import { base } from "wagmi/chains";
 import styles from "@/features/studio/studio.module.css";
 import type { PublicationReceipt, PublishableArtifact } from "@/features/publication/types";
 
+import { getBaseWalletAfterSwitch } from "./base-wallet";
 import { createClankerTokenConfig } from "./clanker-config";
 
 type LaunchState =
@@ -60,20 +61,29 @@ export function LaunchPanel({
       })
     : null;
 
-  const clanker = () => {
-    if (!walletClient.data || !publicClient) throw new Error("Base wallet is not ready.");
+  const clanker = (wallet: WalletClient<Transport, Chain, Account>) => {
+    if (!publicClient) throw new Error("Base public client is not ready.");
     return new Clanker({
-      wallet: walletClient.data as WalletClient<Transport, Chain, Account>,
+      wallet,
       publicClient: publicClient as PublicClient,
     });
   };
+
+  const freshBaseWallet = () =>
+    getBaseWalletAfterSwitch({
+      chainId: connection.chainId,
+      switchToBase: () => switchChain.mutateAsync({ chainId: base.id }),
+      getBaseWallet: async () => {
+        const result = await walletClient.refetch();
+        return result.data as WalletClient<Transport, Chain, Account> | undefined;
+      },
+    });
 
   const simulate = async () => {
     if (!tokenConfig) return;
     setLaunch({ status: "simulating" });
     try {
-      if (connection.chainId !== base.id) await switchChain.mutateAsync({ chainId: base.id });
-      const client = clanker();
+      const client = clanker(await freshBaseWallet());
       const transaction = await client.getDeployTransaction(tokenConfig);
       if (!transaction.expectedAddress) throw new Error("Clanker did not return a predicted token address.");
       const result = await client.deploySimulate(tokenConfig);
@@ -90,7 +100,8 @@ export function LaunchPanel({
     setLaunch({ status: "launching", expectedAddress });
     try {
       const suffix = deploymentSuffix();
-      const result = await clanker().deploy(tokenConfig, suffix ? { dataSuffix: suffix } : undefined);
+      const client = clanker(await freshBaseWallet());
+      const result = await client.deploy(tokenConfig, suffix ? { dataSuffix: suffix } : undefined);
       if ("error" in result && result.error) throw result.error;
       setLaunch({ status: "submitted", txHash: result.txHash });
       const confirmed = await result.waitForTransaction();
@@ -111,6 +122,7 @@ export function LaunchPanel({
       <span>02 / BASE TOKEN</span>
       <strong>{launch.status === "confirmed" ? "TOKEN LIVE" : "CLANKER V4"}</strong>
       <small>Standard Base/WETH launch. Zero automatic dev buy. The wallet always confirms deployment.</small>
+      <small>1% swap fee per side. Clanker anti-sniper fee decays from 66.6777% to 4.1673% during the first 15 seconds.</small>
 
       {!receipt ? <p>Publish the master first.</p> : null}
 

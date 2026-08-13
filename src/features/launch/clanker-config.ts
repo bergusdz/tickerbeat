@@ -45,6 +45,16 @@ export function createClankerTokenConfig({
       tickSpacing: initialPool.tickSpacing,
       positions: POOL_POSITIONS[PoolPositions.Standard],
     },
+    fees: {
+      type: "static",
+      clankerFee: 100,
+      pairedFee: 100,
+    },
+    sniperFees: {
+      startingFee: 666_777,
+      endingFee: 41_673,
+      secondsToDecay: 15,
+    },
     rewards: {
       recipients: [{ admin: creator, recipient: creator, bps: 10_000, token: "Both" }],
     },

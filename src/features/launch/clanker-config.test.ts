@@ -23,6 +23,12 @@ describe("Clanker v4 token configuration", () => {
       tokenAdmin: creator,
       image: "ipfs://bafy-cover",
       pool: { pairedToken: "WETH" },
+      fees: { type: "static", clankerFee: 100, pairedFee: 100 },
+      sniperFees: {
+        startingFee: 666_777,
+        endingFee: 41_673,
+        secondsToDecay: 15,
+      },
       context: { interface: "TickerBeat", platform: "TickerBeat" },
       rewards: {
         recipients: [{ admin: creator, recipient: creator, bps: 10_000, token: "Both" }],
