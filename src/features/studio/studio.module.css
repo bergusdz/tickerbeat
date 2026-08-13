@@ -895,6 +895,7 @@
 
 .soundControls {
   display: grid;
+  min-width: 0;
   gap: 11px;
   margin-bottom: 16px;
   padding: 12px;
@@ -911,6 +912,13 @@
   justify-content: space-between;
   padding-bottom: 9px;
   border-bottom: 1px solid #2d302a;
+}
+
+.soundControls > *,
+.instrumentControl,
+.effectControl,
+.effectControl input {
+  min-width: 0;
 }
 
 .soundControlHeader span,
@@ -933,6 +941,8 @@
 
 .instrumentControl select {
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   height: 34px;
   padding: 0 9px;
   border: 1px solid #44483e;
