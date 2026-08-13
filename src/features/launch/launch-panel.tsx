@@ -19,7 +19,11 @@ import type { PublicationReceipt, PublishableArtifact } from "@/features/publica
 import { getBaseWalletAfterSwitch } from "./base-wallet";
 import { createClankerTokenConfig } from "./clanker-config";
 import { assertClankerLaunchReceipt } from "./launch-receipt";
-import { assertReviewedLaunch, createLaunchReview } from "./launch-review";
+import {
+  assertPublicationCreator,
+  assertReviewedLaunch,
+  createLaunchReview,
+} from "./launch-review";
 
 type LaunchState =
   | { status: "idle" | "simulating" }
@@ -57,9 +61,9 @@ export function LaunchPanel({
   const walletClient = useWalletClient({ chainId: base.id });
   const [launch, setLaunch] = useState<LaunchState>({ status: "idle" });
 
-  const tokenConfig = receipt && connection.address
+  const tokenConfig = receipt
     ? createClankerTokenConfig({
-        creator: connection.address,
+        creator: receipt.creator,
         title: artifact.title,
         symbol: artifact.symbol,
         coverUri: receipt.coverUri,
@@ -88,9 +92,10 @@ export function LaunchPanel({
     });
 
   const simulate = async () => {
-    if (!tokenConfig) return;
+    if (!tokenConfig || !receipt || !connection.address) return;
     setLaunch({ status: "simulating" });
     try {
+      assertPublicationCreator(receipt.creator, connection.address);
       const client = clanker(await freshBaseWallet());
       const transaction = await client.getDeployTransaction(tokenConfig);
       if (!transaction.expectedAddress) throw new Error("Clanker did not return a predicted token address.");
@@ -108,11 +113,11 @@ export function LaunchPanel({
   };
 
   const deploy = async () => {
-    if (!tokenConfig || launch.status !== "ready") return;
+    if (!tokenConfig || !receipt || launch.status !== "ready") return;
     try {
       if (!connection.address) throw new Error("Reconnect the launch wallet.");
       if (!publicClient) throw new Error("Base public client is not ready.");
-      const expectedCreator = connection.address;
+      const expectedCreator = assertPublicationCreator(receipt.creator, connection.address);
       const expectedAddress = assertReviewedLaunch(
         launch.reviewedConfig,
         currentConfig,
@@ -150,7 +155,7 @@ export function LaunchPanel({
   const review =
     receipt && connection.address && (launch.status === "ready" || launch.status === "launching")
       ? createLaunchReview({
-          creator: connection.address,
+          creator: receipt.creator,
           expectedAddress: launch.expectedAddress,
           metadataUri: receipt.metadataUri,
           valueWei: launch.valueWei,
@@ -184,6 +189,9 @@ export function LaunchPanel({
       {receipt && connection.status === "connected" ? (
         <div className={styles.launchActions}>
           <p>{shortAddress(connection.address)} / {connection.chainId === base.id ? "BASE" : "WRONG NETWORK"}</p>
+          {connection.address.toLowerCase() !== receipt.creator.toLowerCase() ? (
+            <p className={styles.renderError}>Reconnect {shortAddress(receipt.creator)} — this wallet owns the immutable release.</p>
+          ) : null}
           {launch.status === "confirmed" ? (
             <div className={styles.launchLinks}>
               <a href={`https://basescan.org/token/${launch.tokenAddress}`} target="_blank" rel="noreferrer">BASESCAN ↗</a>
@@ -203,7 +211,11 @@ export function LaunchPanel({
               ) : null}
               <button
                 type="button"
-                disabled={launch.status === "simulating" || launch.status === "launching"}
+                disabled={
+                  launch.status === "simulating" ||
+                  launch.status === "launching" ||
+                  connection.address.toLowerCase() !== receipt.creator.toLowerCase()
+                }
                 onClick={() => void simulate()}
               >
                 {launch.status === "simulating" ? "SIMULATING…" : "CHECK LAUNCH"}

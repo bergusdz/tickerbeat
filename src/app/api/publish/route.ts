@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { PinataSDK } from "pinata";
+import { isAddress } from "viem";
 
 import { publishArtifacts } from "@/features/publication/publish-artifacts";
 import { validatePublicationFiles } from "@/features/publication/validation";
@@ -26,12 +27,16 @@ export async function POST(request: Request) {
     const title = requiredText(form, "title");
     const symbol = requiredText(form, "symbol")?.toUpperCase() ?? null;
     const tempoText = requiredText(form, "tempo");
+    const creator = requiredText(form, "creator");
     const audio = form.get("audio");
     const cover = form.get("cover");
     const project = form.get("project");
 
-    if (!title || !symbol || !tempoText || !(audio instanceof File) || !(cover instanceof File) || !(project instanceof File)) {
+    if (!title || !symbol || !tempoText || !creator || !(audio instanceof File) || !(cover instanceof File) || !(project instanceof File)) {
       return NextResponse.json({ error: "The release payload is incomplete." }, { status: 400 });
+    }
+    if (!isAddress(creator)) {
+      return NextResponse.json({ error: "Creator must be a valid wallet address." }, { status: 400 });
     }
     if (!/^[A-Z0-9]{1,10}$/.test(symbol)) {
       return NextResponse.json({ error: "Ticker must contain 1-10 letters or numbers." }, { status: 400 });
@@ -49,6 +54,7 @@ export async function POST(request: Request) {
       title,
       symbol,
       tempo,
+      creator,
       audio,
       cover,
       project,

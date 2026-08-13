@@ -11,6 +11,7 @@ export type PublishableArtifact = {
 };
 
 export type PublicationReceipt = {
+  creator: `0x${string}`;
   audioCid: string;
   coverCid: string;
   projectCid: string;

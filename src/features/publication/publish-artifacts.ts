@@ -1,12 +1,14 @@
 import type { PinataSDK } from "pinata";
 
 import { createPublicationMetadata, gatewayUrl, ipfsUri } from "./metadata";
+import { sha256Hex } from "./provenance";
 import type { PublicationReceipt } from "./types";
 
 type PublishInput = {
   title: string;
   symbol: string;
   tempo: number;
+  creator: `0x${string}`;
   audio: File;
   cover: File;
   project: File;
@@ -24,6 +26,10 @@ export async function publishArtifacts(
   input: PublishInput,
 ): Promise<PublicationReceipt> {
   const tags = { app: "tickerbeat", release: input.symbol };
+  const [audioSha256, projectSha256] = await Promise.all([
+    sha256Hex(input.audio),
+    sha256Hex(input.project),
+  ]);
   const [audio, cover, project] = await Promise.all([
     pinata.upload.public.file(input.audio).name(input.audio.name).keyvalues({ ...tags, kind: "audio" }),
     pinata.upload.public.file(input.cover).name(input.cover.name).keyvalues({ ...tags, kind: "cover" }),
@@ -34,6 +40,10 @@ export async function publishArtifacts(
     symbol: input.symbol,
     description: `${input.title} is a playable TickerBeat release created in the browser and launched on Base.`,
     tempo: input.tempo,
+    creator: input.creator,
+    durationSeconds: Number(((60 / input.tempo) * 4).toFixed(3)),
+    audioSha256,
+    projectSha256,
     audioCid: audio.cid,
     coverCid: cover.cid,
     projectCid: project.cid,
@@ -46,6 +56,7 @@ export async function publishArtifacts(
   const publicGateway = normalizeGateway(gateway);
 
   return {
+    creator: input.creator,
     audioCid: audio.cid,
     coverCid: cover.cid,
     projectCid: project.cid,

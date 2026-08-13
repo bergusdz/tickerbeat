@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { assertReviewedLaunch, createLaunchReview } from "./launch-review";
+import {
+  assertPublicationCreator,
+  assertReviewedLaunch,
+  createLaunchReview,
+} from "./launch-review";
 
 const expectedAddress = "0x1111111111111111111111111111111111111111" as const;
 
@@ -32,5 +36,13 @@ describe("launch review binding", () => {
     expect(() => assertReviewedLaunch("config-a", "config-b", expectedAddress)).toThrow(
       "Launch details changed. Check the launch again.",
     );
+  });
+
+  it("requires the launch wallet to match the immutable publication creator", () => {
+    const creator = "0xabcdefabcdefabcdefabcdefabcdefabcdefabcd" as const;
+    expect(assertPublicationCreator(creator, `0x${creator.slice(2).toUpperCase()}`)).toBe(creator);
+    expect(() =>
+      assertPublicationCreator(creator, "0x3333333333333333333333333333333333333333"),
+    ).toThrow("Reconnect the wallet that published this sound.");
   });
 });

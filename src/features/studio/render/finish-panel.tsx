@@ -62,7 +62,7 @@ export function FinishPanel({
         : undefined;
       const audio = await renderProjectToWav(finalized, decodedClip);
       const cover = createCoverSvg(finalized);
-      const projectFile = new Blob([JSON.stringify({ version: 1, project: finalized }, null, 2)], {
+      const projectFile = new Blob([JSON.stringify({ version: 2, project: finalized }, null, 2)], {
         type: "application/json",
       });
       setArtifact({
