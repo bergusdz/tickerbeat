@@ -993,10 +993,8 @@
   font-size: 7px;
 }
 
-.clipPanel audio {
-  width: 100%;
-  height: 30px;
-  margin-top: 10px;
+.clipPreviewAudio {
+  display: none;
 }
 
 .clipMeta {
@@ -1013,9 +1011,41 @@
 
 .clipActions {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 5px;
   margin-top: 10px;
+}
+
+.clipEditor {
+  display: grid;
+  gap: 7px;
+  margin-top: 11px;
+  padding-top: 10px;
+  border-top: 1px solid #2d302a;
+}
+
+.clipEditor > small {
+  color: #65695f;
+  font-size: 7px;
+  text-align: right;
+}
+
+.clipControl {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 23px;
+  align-items: center;
+  gap: 6px;
+}
+
+.clipControl span,
+.clipControl output {
+  color: #7d8276;
+  font-size: 7px;
+}
+
+.clipControl output {
+  color: var(--acid);
+  text-align: right;
 }
 
 .clipActions button {
@@ -1032,6 +1062,11 @@
 .clipActions button.recording {
   border-color: var(--signal);
   color: var(--signal);
+}
+
+.clipActions button.previewing {
+  border-color: var(--acid);
+  color: var(--acid);
 }
 
 .visuallyHidden {

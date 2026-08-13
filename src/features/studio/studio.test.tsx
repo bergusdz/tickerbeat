@@ -18,7 +18,13 @@ vi.mock("./use-studio-audio", () => ({
 }));
 
 describe("Studio", () => {
-  beforeEach(() => audio.togglePlayback.mockClear());
+  beforeEach(() => {
+    audio.togglePlayback.mockClear();
+    vi.stubGlobal("URL", {
+      createObjectURL: vi.fn(() => "blob:studio-test"),
+      revokeObjectURL: vi.fn(),
+    });
+  });
 
   it("renders all four instrument tracks", () => {
     render(<Studio />);
@@ -99,5 +105,33 @@ describe("Studio", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Select Drums track" }));
     expect(screen.getByRole("combobox", { name: "Drums instrument" })).toHaveValue("0");
+  });
+
+  it("trims and levels an imported sample clip", () => {
+    render(<Studio />);
+    fireEvent.change(screen.getByLabelText("Import an audio clip"), {
+      target: {
+        files: [new File(["sample"], "signal.wav", { type: "audio/wav" })],
+      },
+    });
+
+    expect(screen.getByRole("button", { name: "Preview sample clip" })).toBeInTheDocument();
+    expect(screen.getByRole("slider", { name: "Clip start" })).toHaveValue("0");
+    expect(screen.getByRole("slider", { name: "Clip end" })).toHaveValue("100");
+    expect(screen.getByRole("slider", { name: "Clip level" })).toHaveValue("70");
+
+    fireEvent.change(screen.getByRole("slider", { name: "Clip start" }), {
+      target: { value: "25" },
+    });
+    fireEvent.change(screen.getByRole("slider", { name: "Clip end" }), {
+      target: { value: "75" },
+    });
+    fireEvent.change(screen.getByRole("slider", { name: "Clip level" }), {
+      target: { value: "45" },
+    });
+
+    expect(screen.getByRole("slider", { name: "Clip start" })).toHaveValue("25");
+    expect(screen.getByRole("slider", { name: "Clip end" })).toHaveValue("75");
+    expect(screen.getByRole("slider", { name: "Clip level" })).toHaveValue("45");
   });
 });
