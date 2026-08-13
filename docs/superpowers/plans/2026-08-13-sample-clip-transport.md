@@ -18,7 +18,7 @@
 - Modify: `src/features/studio/recording/use-sound-clip.ts`
 - Modify: `src/features/studio/recording/use-sound-clip.test.ts`
 
-- [ ] **Step 1: Write failing tests**
+- [x] **Step 1: Write failing tests**
 
 ```ts
 expect(clipPlaybackWindow(10, { trimStart: 0.2, trimEnd: 0.8, level: 0.5 }, 4))
@@ -26,13 +26,13 @@ expect(clipPlaybackWindow(10, { trimStart: 0.2, trimEnd: 0.8, level: 0.5 }, 4))
 expect(updateClipSettings(clip, { trimStart: 0.9 })).toMatchObject({ trimStart: 0.9, trimEnd: 0.91 });
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `pnpm test src/features/studio/recording/clip-playback.test.ts src/features/studio/recording/use-sound-clip.test.ts`
 
 Expected: FAIL because `clipPlaybackWindow` and settings updates do not exist.
 
-- [ ] **Step 3: Implement bounded settings**
+- [x] **Step 3: Implement bounded settings**
 
 ```ts
 export type ClipPlaybackSettings = { trimStart: number; trimEnd: number; level: number };
@@ -46,7 +46,7 @@ export function clipPlaybackWindow(sourceDuration: number, settings: ClipPlaybac
 
 Every new clip starts at `{ trimStart: 0, trimEnd: 1, level: 0.7 }`. Settings updates clamp to `0..1` and preserve at least a one-percent trim window.
 
-- [ ] **Step 4: Run GREEN and commit**
+- [x] **Step 4: Run GREEN and commit**
 
 Run: `pnpm test src/features/studio/recording/clip-playback.test.ts src/features/studio/recording/use-sound-clip.test.ts`
 
@@ -62,7 +62,7 @@ Commit: `git commit -m "Add canonical sample clip settings"`
 - Modify: `src/features/studio/render/render-project.ts`
 - Modify: `src/features/studio/render/render-project.test.ts`
 
-- [ ] **Step 1: Write failing transport tests**
+- [x] **Step 1: Write failing transport tests**
 
 ```ts
 expect(projectDurationSeconds(createDemoProject())).toBeGreaterThan(0);
@@ -71,13 +71,13 @@ expect(clipPlaybackWindow(8, settings, 2.1)).toEqual({ offset: 2, duration: 2.1,
 
 Add an engine-facing test that `clipShouldTriggerAtStep(0)` is true and every other step is false.
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `pnpm test src/features/studio/audio/tone-engine.test.ts src/features/studio/render/render-project.test.ts`
 
 Expected: FAIL because synchronized clip triggering is absent.
 
-- [ ] **Step 3: Implement Tone.Player and offline parity**
+- [x] **Step 3: Implement Tone.Player and offline parity**
 
 ```ts
 export function clipShouldTriggerAtStep(step: number): boolean {
@@ -87,7 +87,7 @@ export function clipShouldTriggerAtStep(step: number): boolean {
 
 `ToneStudioEngine.updateClip(clip)` loads or replaces one `Tone.Player`, routes it through a gain into the limiter, and reads the pure playback window at step zero. `stop()` stops the player. `renderProjectToWav()` uses the same window for `source.start(0, offset, duration)` and the same gain.
 
-- [ ] **Step 4: Run GREEN and commit**
+- [x] **Step 4: Run GREEN and commit**
 
 Run: `pnpm test src/features/studio/audio/tone-engine.test.ts src/features/studio/render/render-project.test.ts`
 
@@ -100,7 +100,7 @@ Commit: `git commit -m "Sync sample clips with the loop transport"`
 - Modify: `src/features/studio/studio.module.css`
 - Modify: `src/features/studio/studio.test.tsx`
 
-- [ ] **Step 1: Write failing component test**
+- [x] **Step 1: Write failing component test**
 
 ```ts
 expect(screen.getByRole("slider", { name: "Clip start" })).toHaveValue("0");
@@ -108,25 +108,24 @@ fireEvent.change(screen.getByRole("slider", { name: "Clip level" }), { target: {
 expect(screen.getByRole("slider", { name: "Clip level" })).toHaveValue("45");
 ```
 
-- [ ] **Step 2: Run RED**
+- [x] **Step 2: Run RED**
 
 Run: `pnpm test src/features/studio/studio.test.tsx`
 
 Expected: FAIL because the three clip controls are absent.
 
-- [ ] **Step 3: Implement controls and custom preview**
+- [x] **Step 3: Implement controls and custom preview**
 
 Render START, END, and LEVEL sliders only when a clip exists. The PREVIEW button seeks the hidden audio element to `duration * trimStart`, applies `level`, and pauses at `duration * trimEnd`. REMOVE remains explicit.
 
-- [ ] **Step 4: Verify the complete slice**
+- [x] **Step 4: Verify the complete slice**
 
 Run: `pnpm test && pnpm typecheck && pnpm lint && pnpm build`
 
 Expected: all commands exit zero with no new warnings.
 
-- [ ] **Step 5: Browser verification and commit**
+- [x] **Step 5: Browser verification and commit**
 
 Verify import, selected-range preview, loop playback, render invalidation, and mobile overflow in Chromium.
 
 Commit: `git commit -m "Add clip trim and level controls"`
-
