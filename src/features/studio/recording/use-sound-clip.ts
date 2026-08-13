@@ -2,14 +2,29 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import {
+  DEFAULT_CLIP_SETTINGS,
+  updateClipSettings,
+  type ClipPlaybackSettings,
+} from "./clip-playback";
+
 const MAX_CLIP_BYTES = 10_000_000;
 
-export type SoundClip = {
+export type SoundClip = ClipPlaybackSettings & {
   blob: Blob;
   name: string;
   source: "microphone" | "file";
   url: string;
 };
+
+export function createSoundClip(
+  blob: Blob,
+  name: string,
+  source: SoundClip["source"],
+  url: string,
+): SoundClip {
+  return { blob, name, source, url, ...DEFAULT_CLIP_SETTINGS };
+}
 
 export function validateClipFile(file: File): string | null {
   if (!file.type.startsWith("audio/")) return "Choose an audio file.";
@@ -28,7 +43,7 @@ export function useSoundClip() {
 
   const replaceClip = useCallback((blob: Blob, name: string, source: SoundClip["source"]) => {
     if (clipRef.current) URL.revokeObjectURL(clipRef.current.url);
-    const next = { blob, name, source, url: URL.createObjectURL(blob) };
+    const next = createSoundClip(blob, name, source, URL.createObjectURL(blob));
     clipRef.current = next;
     setClip(next);
     setError(null);
@@ -92,6 +107,15 @@ export function useSoundClip() {
     setError(null);
   }, []);
 
+  const setClipSettings = useCallback((patch: Partial<ClipPlaybackSettings>) => {
+    setClip((current) => {
+      if (!current) return current;
+      const next = { ...current, ...updateClipSettings(current, patch) };
+      clipRef.current = next;
+      return next;
+    });
+  }, []);
+
   useEffect(
     () => () => {
       if (recorderRef.current) {
@@ -113,5 +137,6 @@ export function useSoundClip() {
     startRecording,
     stopRecording,
     clearClip,
+    setClipSettings,
   };
 }
