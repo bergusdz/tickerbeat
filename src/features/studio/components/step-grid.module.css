@@ -1,8 +1,8 @@
 .sequencer {
   overflow: hidden;
-  border: 1px solid #34382f;
-  border-radius: 14px;
-  background: #0b0d0b;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--well);
 }
 
 .sectionHeading {
@@ -10,36 +10,32 @@
   align-items: end;
   justify-content: space-between;
   gap: 16px;
-  min-height: 64px;
-  padding: 14px 16px;
+  min-height: 56px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--line);
 }
 
 .sectionHeading > div {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .sectionHeading span,
 .sectionHeading small {
   color: var(--muted);
-  font-size: 0.56rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
 }
 
 .sectionHeading strong {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(0.95rem, 1.5vw, 1.24rem);
+  font-size: 1.05rem;
   letter-spacing: -0.04em;
 }
 
 .channelRail {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 1px;
-  padding: 1px;
-  border-bottom: 1px solid var(--line);
   background: var(--line);
 }
 
@@ -48,43 +44,40 @@
   grid-template-columns: auto 1fr;
   grid-template-rows: auto auto;
   gap: 2px 10px;
-  min-height: 56px;
-  padding: 10px 13px;
+  min-height: var(--touch);
+  padding: 8px 12px;
   border: 0;
-  background: #10130f;
+  background: var(--raised);
   color: var(--muted);
   text-align: left;
-  cursor: pointer;
 }
 
 .channelRail button > span {
   grid-row: 1 / 3;
   align-self: center;
   color: var(--track-color);
-  font-size: 0.65rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
 }
 
 .channelRail button strong {
   color: var(--paper);
-  font-size: 0.7rem;
-  text-transform: uppercase;
+  font-size: 0.82rem;
 }
 
 .channelRail button small {
-  font-size: 0.52rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.68rem;
 }
 
 .channelRail .selectedChannel {
-  background: color-mix(in srgb, var(--track-color), #10130f 88%);
+  background: color-mix(in srgb, var(--track-color), var(--raised) 86%);
   box-shadow: inset 0 -3px var(--track-color);
 }
 
 .gridViewport {
   overflow-x: auto;
-  padding: 20px 16px 16px;
-  scrollbar-color: var(--acid) #11140f;
+  padding: 14px 14px 12px;
+  scrollbar-color: var(--signal) var(--well);
   scrollbar-width: thin;
 }
 
@@ -92,19 +85,19 @@
 .stepRow,
 .accentLane {
   display: grid;
-  grid-template-columns: 44px repeat(16, minmax(34px, 1fr));
-  gap: 6px;
-  min-width: 780px;
+  grid-template-columns: 36px repeat(16, minmax(0, 1fr));
+  gap: 5px;
 }
 
 .beatNumbers {
   align-items: end;
-  margin-bottom: 7px;
+  margin-bottom: 6px;
 }
 
 .beatNumbers span {
-  color: #61675d;
-  font-size: 0.52rem;
+  color: #6d675c;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
   text-align: center;
 }
 
@@ -112,20 +105,26 @@
   color: var(--paper);
 }
 
+.beatNow {
+  color: var(--playhead) !important;
+  font-weight: 600;
+}
+
 .stepRows {
   display: grid;
-  gap: 7px;
+  gap: 6px;
 }
 
 .rowCode {
   display: grid;
-  min-height: 38px;
+  min-height: var(--touch);
   place-items: center;
-  border: 1px solid #363a31;
-  border-radius: 6px;
-  background: #11140f;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--raised);
   color: var(--track-color);
-  font-size: 0.58rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
 }
 
 button.rowCode {
@@ -141,17 +140,17 @@ button.rowCode {
 .accentGrid button {
   position: relative;
   min-width: 0;
-  min-height: 38px;
-  border: 1px solid #353a30;
-  border-radius: 6px;
-  background: #151914;
+  min-height: var(--touch);
+  border: 1px solid #2d2a24;
+  border-radius: 8px;
+  background: #161410;
   cursor: pointer;
   transition: border-color 90ms ease, background 90ms ease, transform 90ms ease;
 }
 
 .stepButton:nth-child(4n + 1),
 .accentGrid button:nth-child(4n + 1) {
-  border-left-color: #747a6e;
+  border-left-color: #6d675c;
 }
 
 .stepButton:hover,
@@ -163,27 +162,27 @@ button.rowCode {
 .stepButton span,
 .accentGrid button span {
   position: absolute;
-  inset: 7px;
-  border-radius: 3px;
-  background: #252a22;
+  inset: 8px;
+  border-radius: 4px;
+  background: #252018;
 }
 
 .stepActive {
-  border-color: color-mix(in srgb, var(--track-color), white 16%);
-  background: color-mix(in srgb, var(--track-color), #0c0e0b 68%);
+  border-color: color-mix(in srgb, var(--track-color), white 18%);
+  background: color-mix(in srgb, var(--track-color), #0c0b09 70%);
 }
 
 .stepActive span {
   background: var(--track-color);
-  box-shadow: 0 0 16px color-mix(in srgb, var(--track-color), transparent 45%);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--track-color), transparent 45%);
 }
 
 .stepAccent span::after {
   position: absolute;
   top: 3px;
   right: 3px;
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #fff;
   content: "";
@@ -192,13 +191,13 @@ button.rowCode {
 .stepCurrent::before {
   position: absolute;
   z-index: 2;
-  top: -6px;
-  right: -3px;
-  bottom: -6px;
-  left: -3px;
-  border: 1px solid var(--acid);
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(210, 255, 55, 0.34);
+  top: -5px;
+  right: -2px;
+  bottom: -5px;
+  left: -2px;
+  border: 1px solid var(--playhead);
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(126, 217, 255, 0.35);
   content: "";
   pointer-events: none;
 }
@@ -206,7 +205,7 @@ button.rowCode {
 .accentLane {
   margin-top: 4px;
   padding-top: 10px;
-  border-top: 1px dashed #30342c;
+  border-top: 1px dashed #2d2a24;
 }
 
 .accentLane > .rowCode {
@@ -214,12 +213,12 @@ button.rowCode {
 }
 
 .accentGrid button {
-  min-height: 22px;
+  min-height: var(--touch);
   border-style: dashed;
 }
 
 .accentGrid button span {
-  inset: 6px 10px;
+  inset: 14px 10px;
 }
 
 .accentGrid button:disabled {
@@ -236,35 +235,43 @@ button.rowCode {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 13px 16px;
+  padding: 10px 16px;
   border-top: 1px solid var(--line);
-  background: #10130f;
+  background: var(--raised);
 }
 
 .sequenceFooter p {
   margin: 0;
   color: var(--muted);
-  font-size: 0.58rem;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
 }
 
 .sequenceFooter button {
-  min-height: 42px;
-  padding: 10px 13px;
-  border: 1px solid #444a3d;
-  border-radius: 6px;
-  background: #151914;
+  min-height: var(--touch);
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--well);
   color: var(--paper);
-  font-size: 0.58rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  cursor: pointer;
+  font-size: 0.78rem;
 }
 
 .sequenceFooter button:hover {
-  border-color: var(--acid);
-  color: var(--acid);
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+@media (max-width: 720px) {
+  .gridViewport {
+    mask-image: linear-gradient(90deg, #000 0%, #000 calc(100% - 24px), transparent);
+  }
+
+  .beatNumbers,
+  .stepRow,
+  .accentLane {
+    grid-template-columns: 36px repeat(16, 40px);
+    min-width: 716px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -274,24 +281,16 @@ button.rowCode {
     flex-direction: column;
   }
 
-  .sectionHeading {
-    min-height: 74px;
+  .channelRail {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
-  .channelRail {
-    grid-template-columns: repeat(4, minmax(112px, 1fr));
-    overflow-x: auto;
+  .channelRail button small {
+    display: none;
   }
 
   .gridViewport {
     padding-inline: 10px;
-  }
-
-  .beatNumbers,
-  .stepRow,
-  .accentLane {
-    grid-template-columns: 38px repeat(16, 36px);
-    min-width: 704px;
   }
 }
 

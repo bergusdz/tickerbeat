@@ -51,10 +51,10 @@ export function StepGrid({
     <section className={styles.sequencer} aria-label="Step sequencer">
       <header className={styles.sectionHeading}>
         <div>
-          <span>Pattern A / 01</span>
-          <strong>THE TICKER TAPE</strong>
+          <span>1 bar · 16 steps</span>
+          <strong>Ticker tape</strong>
         </div>
-        <small>1 BAR · 16 STEPS · CLICK TO ARM</small>
+        <small>Tap a pad to write the beat. On a phone, swipe the tape.</small>
       </header>
 
       <div className={styles.channelRail} aria-label="Instrument channels">
@@ -72,7 +72,12 @@ export function StepGrid({
         <div className={styles.beatNumbers} aria-hidden="true">
           <span />
           {Array.from({ length: 16 }, (_, index) => (
-            <span key={index}>{String(index + 1).padStart(2, "0")}</span>
+            <span
+              key={index}
+              className={isPlaying && currentStep === index ? styles.beatNow : undefined}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
           ))}
         </div>
 
@@ -102,6 +107,7 @@ export function StepGrid({
                     } ${isPlaying && currentStep === index ? styles.stepCurrent : ""}`}
                     aria-label={`${track.label} step ${index + 1}`}
                     aria-pressed={step.active}
+                    aria-current={isPlaying && currentStep === index ? "true" : undefined}
                     onClick={() =>
                       onEdit({ type: "toggle-step", trackId: track.id, step: index })
                     }
@@ -144,7 +150,7 @@ export function StepGrid({
 
       <footer className={styles.sequenceFooter}>
         <p>
-          Accent lane: <strong style={{ color: activeTrack.color }}>{activeTrack.label}</strong>
+          Accents follow <strong style={{ color: activeTrack.color }}>{activeTrack.label}</strong>
         </p>
         <button
           type="button"

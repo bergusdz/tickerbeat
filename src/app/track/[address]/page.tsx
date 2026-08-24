@@ -43,8 +43,8 @@ export default async function TrackPage({ params }: TrackPageProps) {
   return (
     <main className={styles.page}>
       <header className={styles.topbar}>
-        <Link href="/#board">← TICKERBEAT / SOUND BOARD</Link>
-        <span>BASE / CLANKER V4</span>
+        <Link href="/#board">← Sound board</Link>
+        <span>Base · Clanker v4</span>
       </header>
       <article className={styles.release}>
         <div>
@@ -53,17 +53,17 @@ export default async function TrackPage({ params }: TrackPageProps) {
           ) : <div className={styles.fallback}>{release.symbol.slice(0, 2)}</div>}
         </div>
         <div className={styles.details}>
-          <span>PLAYABLE TOKEN / BASE</span>
+          <span>Playable release</span>
           <h1>{release.name}</h1>
           <strong className={styles.ticker}>${release.symbol}</strong>
           {audio ? <audio controls preload="metadata" src={audio} /> : null}
-          <p>The sound is the artifact. The token is its onchain market. Verify both before you trade.</p>
+          <p>The sound is the artifact. The token is its onchain market. Listen, then verify, then trade.</p>
           <nav className={styles.actions}>
-            <a href={`https://base.app/coin/base-mainnet/${release.address}`} target="_blank" rel="noreferrer">TRADE IN BASE APP ↗</a>
-            <a href={`https://basescan.org/token/${release.address}`} target="_blank" rel="noreferrer">VERIFY ON BASESCAN ↗</a>
-            {release.metadataUrl ? <a href={publicUrl(release.metadataUrl)} target="_blank" rel="noreferrer">METADATA ↗</a> : null}
+            <a href={`https://base.app/coin/base-mainnet/${release.address}`} target="_blank" rel="noreferrer">Trade in Base App</a>
+            <a href={`https://basescan.org/token/${release.address}`} target="_blank" rel="noreferrer">Verify on Basescan</a>
+            {release.metadataUrl ? <a href={publicUrl(release.metadataUrl)} target="_blank" rel="noreferrer">Metadata</a> : null}
           </nav>
-          <p className={styles.address}>CONTRACT / {release.address}</p>
+          <p className={styles.address}>Contract · {release.address}</p>
         </div>
       </article>
     </main>

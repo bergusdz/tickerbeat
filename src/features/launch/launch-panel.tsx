@@ -45,9 +45,9 @@ export function LaunchPanel({
 
   return (
     <div className={styles.releaseStage}>
-      <span>02 / BASE TOKEN</span>
-      <strong>{confirmed ? "TOKEN LIVE" : "CLANKER V4"}</strong>
-      <small>Standard Base/WETH launch. Zero automatic dev buy. The wallet always confirms deployment.</small>
+      <span>2 · Launch</span>
+      <strong>{confirmed ? "Token live" : "Clanker v4 on Base"}</strong>
+      <small>Standard Base/WETH market. No automatic developer buy. Your wallet confirms the deploy.</small>
       <small>1% swap fee per side. Clanker anti-sniper fee decays during the first 15 seconds.</small>
 
       {!receipt ? <p>Publish the master first.</p> : null}
@@ -76,12 +76,12 @@ export function LaunchPanel({
             <>
               {review ? (
                 <dl className={styles.launchReview}>
-                  <div><dt>PROTOCOL</dt><dd>Clanker v4</dd></div>
-                  <div><dt>NETWORK</dt><dd>Base / 8453</dd></div>
-                  <div><dt>CREATOR</dt><dd title={review.creator}>{shortAddress(review.creator)}</dd></div>
-                  <div><dt>METADATA</dt><dd title={review.metadataUri}>IPFS / IMMUTABLE</dd></div>
-                  <div><dt>PREDICTED TOKEN</dt><dd title={review.expectedAddress}>{shortAddress(review.expectedAddress)}</dd></div>
-                  <div><dt>TX VALUE</dt><dd>{formatEther(BigInt(review.valueWei))} ETH</dd></div>
+                  <div><dt>Protocol</dt><dd>Clanker v4</dd></div>
+                  <div><dt>Network</dt><dd>Base / 8453</dd></div>
+                  <div><dt>Creator</dt><dd title={review.creator}>{shortAddress(review.creator)}</dd></div>
+                  <div><dt>Metadata</dt><dd title={review.metadataUri}>IPFS / immutable</dd></div>
+                  <div><dt>Predicted token</dt><dd title={review.expectedAddress}>{shortAddress(review.expectedAddress)}</dd></div>
+                  <div><dt>Tx value</dt><dd>{formatEther(BigInt(review.valueWei))} ETH</dd></div>
                 </dl>
               ) : null}
               <button type="button" disabled={busy || wrongCreator} onClick={onReview}>

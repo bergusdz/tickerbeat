@@ -83,10 +83,10 @@ describe("ReleaseShell", () => {
     await screen.findByRole("link", { name: "VIEW METADATA →" });
 
     fireEvent.click(screen.getByRole("button", { name: "CHECK LAUNCH" }));
-    await screen.findByText("PREDICTED TOKEN");
+    await screen.findByText(/predicted token/i);
     fireEvent.click(screen.getByRole("button", { name: "LAUNCH TOKEN" }));
 
-    await screen.findByText("TOKEN LIVE");
+    await screen.findByText(/token live/i);
     expect(publicationGateway.publish).toHaveBeenCalledWith(artifact, creator);
     expect(launcher.review).toHaveBeenCalledOnce();
     expect(launcher.submit).toHaveBeenCalledOnce();

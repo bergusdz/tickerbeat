@@ -46,12 +46,13 @@ function historyReducer(history: ProjectHistory, action: HistoryAction): Project
       return redo(history);
   }
 }
+
 function EmptyBoard() {
   return (
     <section className={styles.boardPlaceholder} aria-label="Release board">
-      <span>LIVE ON BASE / CLANKER V4</span>
-      <strong>THE FIRST SLOT IS OPEN.</strong>
-      <p>Confirmed TickerBeat releases appear here with playable audio and Base links.</p>
+      <span>No confirmed releases yet</span>
+      <strong>The first slot is open.</strong>
+      <p>Finish a loop, publish it, then launch on Base. Confirmed releases appear here with playable audio.</p>
     </section>
   );
 }
@@ -98,7 +99,7 @@ export function Studio({ board }: { board?: ReactNode }) {
 
   return (
     <main className={styles.pageShell}>
-      <div className={styles.ambientGrid} aria-hidden="true" />
+      <div className={styles.ambient} aria-hidden="true" />
 
       <header className={styles.siteHeader}>
         <a className={styles.brand} href="#studio" aria-label="TickerBeat studio home">
@@ -107,63 +108,35 @@ export function Studio({ board }: { board?: ReactNode }) {
           </span>
           <span>
             <strong>TickerBeat</strong>
-            <small>BASE AUDIO INSTRUMENT / 001</small>
+            <small>Make sound. Make market.</small>
           </span>
         </a>
-        <p className={styles.tagline}>MAKE SOUND <i /> MAKE MARKET</p>
-        <div className={styles.networkPill}>
-          <span /> BASE
-        </div>
+        <p
+          className={styles.nowPlaying}
+          aria-label={isPlaying ? "Transport running" : "Transport stopped"}
+        >
+          <span className={isPlaying ? styles.signalLive : styles.signalIdle} />
+          <strong>{project.title.toUpperCase()}</strong>
+          <small>{project.tempo} BPM</small>
+        </p>
       </header>
 
-      <section className={styles.hero}>
-        <div>
-          <p className={styles.eyebrow}>BROWSER DJ DESK · NO DOWNLOAD · LIVE MACHINE</p>
-          <h1>
-            YOUR SOUND.
-            <br />
-            <em>YOUR TICKER.</em>
-          </h1>
-        </div>
-        <div className={styles.heroCopy}>
-          <strong>01: MAKE THE LOOP</strong>
-          <p>Tap a pattern, shape the signal, record anything. Release only when it sounds right.</p>
-        </div>
-      </section>
-
       <section id="studio" className={styles.machine} aria-label="TickerBeat music studio">
-        <div className={styles.machineHeader}>
-          <div>
-            <span className={styles.machineLabel}>TB–01</span>
-            <strong>LOOP TOKEN WORKSTATION</strong>
-          </div>
-          <div className={styles.display}>
-            <span>NOW EDITING</span>
-            <strong>{project.title.toUpperCase()}</strong>
-          </div>
-          <div
-            className={styles.signalCluster}
-            aria-label={isPlaying ? "Transport running" : "Transport stopped"}
-          >
-            <span className={isPlaying ? styles.signalLive : ""} />
-            <small>{isPlaying ? "SIGNAL LIVE" : "ENGINE IDLE"}</small>
-          </div>
-        </div>
+        <Transport
+          project={project}
+          isPlaying={isPlaying}
+          canUndo={history.past.length > 0}
+          canRedo={history.future.length > 0}
+          onTogglePlayback={() => void togglePlayback()}
+          onEdit={edit}
+          onUndo={() => dispatch({ type: "undo" })}
+          onRedo={() => dispatch({ type: "redo" })}
+        />
 
         <Workspace
           panels={{
             make: (
               <div className={styles.makeStage}>
-                <Transport
-                  project={project}
-                  isPlaying={isPlaying}
-                  canUndo={history.past.length > 0}
-                  canRedo={history.future.length > 0}
-                  onTogglePlayback={() => void togglePlayback()}
-                  onEdit={edit}
-                  onUndo={() => dispatch({ type: "undo" })}
-                  onRedo={() => dispatch({ type: "redo" })}
-                />
                 <StepGrid
                   project={project}
                   selectedTrack={selectedTrack}
@@ -197,20 +170,13 @@ export function Studio({ board }: { board?: ReactNode }) {
 
         <footer className={styles.machineFooter}>
           <p>
-            <span>●</span> LOCAL DRAFT
+            <span aria-hidden="true">●</span> Local draft
           </p>
-          <p>16 STEPS / 4 CHANNELS / {project.tempo} BPM</p>
-          <p>RENDER → IPFS → BASE</p>
+          <p>
+            {project.tracks.length} tracks · 16 steps · {project.tempo} BPM
+          </p>
+          <p>Render, then publish, then launch</p>
         </footer>
-      </section>
-
-      <section className={styles.promiseStrip} aria-label="TickerBeat principles">
-        <span>01 / BUILD</span>
-        <strong>Compose before you speculate.</strong>
-        <span>02 / LISTEN</span>
-        <strong>Every ticker has a sound.</strong>
-        <span>03 / LAUNCH</span>
-        <strong>One loop. One market.</strong>
       </section>
     </main>
   );

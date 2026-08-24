@@ -116,6 +116,17 @@ describe("Studio", () => {
     expect(audio.togglePlayback).toHaveBeenCalledOnce();
   });
 
+  it("keeps transport mounted when switching stages", () => {
+    render(<Studio />);
+
+    fireEvent.click(screen.getByRole("tab", { name: "Mix" }));
+    expect(screen.getByRole("button", { name: "Play beat" })).toBeVisible();
+
+    fireEvent.click(screen.getByRole("tab", { name: "Finish" }));
+    expect(screen.getByRole("button", { name: "Play beat" })).toBeVisible();
+    expect(screen.queryByRole("button", { name: /launch token/i })).not.toBeInTheDocument();
+  });
+
   it("shapes the selected channel without changing the others", () => {
     render(<Studio />);
 

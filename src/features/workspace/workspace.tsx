@@ -10,14 +10,13 @@ type WorkspacePanels = Record<WorkspaceStage, ReactNode>;
 
 const STAGES: ReadonlyArray<{
   id: WorkspaceStage;
-  index: string;
   label: string;
   detail: string;
 }> = [
-  { id: "make", index: "01", label: "Make", detail: "Sequence" },
-  { id: "mix", index: "02", label: "Mix", detail: "Shape" },
-  { id: "finish", index: "03", label: "Finish", detail: "Release" },
-  { id: "board", index: "04", label: "Board", detail: "Discover" },
+  { id: "make", label: "Make", detail: "Write the beat" },
+  { id: "mix", label: "Mix", detail: "Shape the sound" },
+  { id: "finish", label: "Finish", detail: "Render and release" },
+  { id: "board", label: "Board", detail: "Play releases" },
 ];
 
 export function Workspace({ panels }: { panels: WorkspacePanels }) {
@@ -71,7 +70,6 @@ export function Workspace({ panels }: { panels: WorkspacePanels }) {
               onClick={() => setActiveStage(stage.id)}
               onKeyDown={(event) => handleKeyDown(event, index)}
             >
-              <span>{stage.index}</span>
               <strong>{stage.label}</strong>
               <small>{stage.detail}</small>
             </button>

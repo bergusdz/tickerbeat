@@ -33,7 +33,7 @@ function ChannelStrip({
         <span className={styles.trackLed} />
         <span>
           <strong>{track.label}</strong>
-          <small>{track.id === "drums" ? "DRUM BUS" : track.note.toString()}</small>
+          <small>{track.muted ? "Muted" : track.solo ? "Solo" : track.id === "drums" ? "Drum bus" : track.note.toString()}</small>
         </span>
       </button>
 
@@ -59,7 +59,7 @@ function ChannelStrip({
       </div>
 
       <label className={styles.volumeControl}>
-        <span>Volume</span>
+        <span>Vol</span>
         <input
           aria-label={`${track.label} volume`}
           type="range"
@@ -104,10 +104,10 @@ export function Mixer({
       <section className={styles.mixer} aria-label="Track mixer">
         <header className={styles.sectionHeading}>
           <div>
-            <span>Desk A / four channels</span>
-            <strong>LEVELS</strong>
+            <span>Four channels</span>
+            <strong>Levels</strong>
           </div>
-          <small>MUTE · SOLO · GAIN</small>
+          <small>Mute · Solo · Gain</small>
         </header>
         <div className={styles.channelStrips}>
           {project.tracks.map((track) => (
@@ -125,10 +125,10 @@ export function Mixer({
       <section className={styles.performance} aria-label="Performance controls">
         <header className={styles.sectionHeading}>
           <div>
-            <span>Channel edit / {activeTrack.id}</span>
-            <strong>SHAPE {activeTrack.label.toUpperCase()}</strong>
+            <span>Selected · {activeTrack.label}</span>
+            <strong>Voice and space</strong>
           </div>
-          <small>VOICE · FILTER · ECHO</small>
+          <small>Instrument · Filter · Echo</small>
         </header>
 
         <div
@@ -214,8 +214,8 @@ export function Mixer({
 
         <div className={styles.masterPanel}>
           <div>
-            <span>Master out</span>
-            <small>{isPlaying ? "-03.8 dB" : "-∞ dB"}</small>
+            <span>Master</span>
+            <small>{isPlaying ? "Live" : "Idle"}</small>
           </div>
           <div className={styles.meter} aria-hidden="true">
             {Array.from({ length: 14 }, (_, index) => (

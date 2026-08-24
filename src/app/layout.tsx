@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { IBM_Plex_Mono, Unbounded } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Mono, IBM_Plex_Sans, Unbounded } from "next/font/google";
 
 import { Providers } from "./providers";
 import "./globals.css";
@@ -7,6 +7,12 @@ import "./globals.css";
 const display = Unbounded({
   subsets: ["latin", "cyrillic"],
   variable: "--font-display",
+});
+
+const sans = IBM_Plex_Sans({
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-sans",
+  weight: ["400", "500", "600"],
 });
 
 const mono = IBM_Plex_Mono({
@@ -17,26 +23,34 @@ const mono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://tickerbeat.vercel.app"),
-  title: "TickerBeat — Make a beat. Launch a ticker.",
+  title: "TickerBeat — Make sound. Make market.",
   description:
-    "A browser groovebox where every finished sound can become a token on Base.",
+    "A browser groovebox where you build a short loop, publish the sound, and launch its market on Base.",
   applicationName: "TickerBeat",
   openGraph: {
-    title: "TickerBeat — Sound is the new ticker.",
+    title: "TickerBeat — Make sound. Make market.",
     description: "Build a loop in the browser, publish its sound, and launch its market on Base.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "TickerBeat — Sound is the new ticker.",
+    title: "TickerBeat — Make sound. Make market.",
     description: "Build a loop in the browser, publish its sound, and launch its market on Base.",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#070605",
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${display.variable} ${mono.variable}`}><Providers>{children}</Providers></body>
+      <body className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

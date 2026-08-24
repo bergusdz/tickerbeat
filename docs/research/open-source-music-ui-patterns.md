@@ -45,9 +45,9 @@ reviewed so later design decisions remain auditable.
 
 ## Resulting direction
 
-TickerBeat will be an **industrial broadcast sampler**: a compact black desk
-with warm off-white labels, one high-energy signal-lime accent and oversized
-performance controls. The memorable object is a 16-step "ticker tape" whose
-playhead travels across the machine. The workflow is staged as **Make, Mix,
-Finish, Board**, while project and playback state remain mounted across stages.
+TickerBeat is a **Night Tape Groovebox**: a compact instrument chassis, not a
+marketing landing page. Warm off-white labels, signal lime reserved for live
+playback, and a cyan playhead mark the 16-step ticker tape. The workflow stays
+**Make, Mix, Finish, Board**, with transport mounted across stages. The visual
+system is recorded in [`0005-night-tape-groovebox.md`](../decisions/0005-night-tape-groovebox.md).
 

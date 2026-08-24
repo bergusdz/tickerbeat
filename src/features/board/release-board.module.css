@@ -1,85 +1,86 @@
 .board {
-  padding: clamp(18px, 2.5vw, 32px);
+  padding: 8px 4px 4px;
 }
 
 .board > header {
   display: flex;
   align-items: end;
   justify-content: space-between;
-  gap: 28px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--line);
+  gap: 24px;
+  padding: 8px 8px 18px;
 }
 
 .board header span,
 .empty > span,
 .grid article > span {
-  color: var(--acid);
-  font-size: 0.56rem;
-  letter-spacing: 0.13em;
+  color: var(--muted);
+  font-size: 0.72rem;
 }
 
 .board h2 {
-  margin: 7px 0 0;
+  margin: 4px 0 0;
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(1.7rem, 4.8vw, 4rem);
-  letter-spacing: -0.07em;
+  font-size: clamp(1.5rem, 3.6vw, 2.6rem);
+  letter-spacing: -0.05em;
 }
 
 .board header p {
-  max-width: 420px;
+  max-width: 360px;
   margin: 0;
   color: var(--muted);
-  font-size: 0.66rem;
-  line-height: 1.7;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .empty {
   display: grid;
-  min-height: 390px;
+  min-height: 320px;
   place-content: center;
   justify-items: start;
-  gap: 13px;
-  margin-top: 14px;
-  padding: 38px;
-  border: 1px solid #34382f;
+  gap: 10px;
+  padding: 32px 24px;
+  border: 1px solid var(--line-strong);
   border-radius: 12px;
-  background:
-    linear-gradient(90deg, transparent 49.9%, rgba(210, 255, 55, 0.08) 50%, transparent 50.1%),
-    linear-gradient(transparent 49.9%, rgba(210, 255, 55, 0.08) 50%, transparent 50.1%),
-    #0c0f0b;
-  background-size: 44px 44px;
+  background: var(--well);
 }
 
 .empty strong {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(1.35rem, 3vw, 2.8rem);
+  font-size: clamp(1.3rem, 3vw, 2.2rem);
 }
 
 .empty p {
-  max-width: 460px;
+  max-width: 440px;
   margin: 0;
   color: var(--muted);
-  font-size: 0.65rem;
-  line-height: 1.6;
+  font-size: 0.88rem;
+  line-height: 1.5;
 }
 
 .empty a,
 .grid nav a {
-  min-height: 42px;
-  padding: 11px 14px;
-  border: 1px solid var(--acid);
-  border-radius: 6px;
-  color: var(--acid);
-  font-size: 0.58rem;
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 10px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  color: var(--paper);
+  font-size: 0.78rem;
   text-decoration: none;
+}
+
+.grid nav a:first-child {
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--void);
+  font-weight: 600;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  margin-top: 14px;
 }
 
 .grid article {
@@ -87,55 +88,57 @@
   gap: 10px;
   min-width: 0;
   padding: 14px;
-  border: 1px solid #34382f;
-  border-radius: 10px;
-  background: #0c0f0b;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  background: var(--well);
   transition: border-color 140ms ease, box-shadow 140ms ease;
 }
 
 .grid article[data-playing="true"] {
-  border-color: var(--acid);
-  box-shadow: inset 0 0 0 1px rgba(210, 255, 55, 0.23);
+  border-color: var(--playhead);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--playhead) 40%, transparent);
 }
 
 .grid img,
 .cover {
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1;
   object-fit: cover;
-  border: 1px solid #464b3e;
-  border-radius: 7px;
-  background: #171d10;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: #17130f;
 }
 
 .cover {
   display: grid;
   place-items: center;
-  color: var(--acid);
+  color: var(--signal);
   font-family: var(--font-display), sans-serif;
-  font-size: 2.6rem;
+  font-size: 2.4rem;
 }
 
 .grid h3 {
   margin: 0;
   font-family: var(--font-display), sans-serif;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  letter-spacing: -0.03em;
 }
 
 .grid article > strong {
-  color: var(--acid);
-  font-size: 0.62rem;
+  color: var(--muted);
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
 }
 
 .grid audio {
   width: 100%;
-  height: 34px;
+  height: 36px;
 }
 
 .grid nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 6px;
 }
 
 @media (max-width: 900px) {
@@ -145,10 +148,6 @@
 }
 
 @media (max-width: 620px) {
-  .board {
-    padding: 12px;
-  }
-
   .board > header {
     align-items: start;
     flex-direction: column;
@@ -159,7 +158,7 @@
   }
 
   .empty {
-    min-height: 320px;
+    min-height: 280px;
     padding: 24px 18px;
   }
 }

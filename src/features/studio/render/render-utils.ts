@@ -74,14 +74,13 @@ export function createCoverSvg(project: StudioProject): Blob {
     .join("");
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200" viewBox="0 0 1200 1200">
-<rect width="1200" height="1200" fill="#0a0b08" />
-<path d="M0 0H1200V1200H0Z" fill="url(#grid)" opacity=".2" />
-<defs><pattern id="grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#d9ff43" stroke-width="1" /></pattern></defs>
-<text x="90" y="110" fill="#d9ff43" font-family="monospace" font-size="24" letter-spacing="6">TICKERBEAT // BASE AUDIO</text>
-<text x="88" y="260" fill="#f0eee5" font-family="Arial Black, sans-serif" font-size="112" font-weight="900">${title}</text>
-<text x="92" y="430" fill="none" stroke="#d9ff43" stroke-width="3" font-family="Arial Black, sans-serif" font-size="150" font-weight="900">${project.tempo} BPM</text>
+<rect width="1200" height="1200" fill="#070605" />
+<rect x="64" y="64" width="1072" height="1072" rx="48" fill="#12100c" stroke="#3a342c" />
+<text x="108" y="168" fill="#9a9386" font-family="monospace" font-size="28">TICKERBEAT</text>
+<text x="104" y="300" fill="#f3eee4" font-family="Arial Black, sans-serif" font-size="92" font-weight="900">${title}</text>
+<text x="108" y="430" fill="#d8ff3c" font-family="monospace" font-size="42">${project.tempo} BPM · 16 STEPS</text>
 ${bars}
-<text x="92" y="1080" fill="#8e9287" font-family="monospace" font-size="28">ACTIVE STEPS ${density} / ONE LOOP / ONE MARKET</text>
+<text x="108" y="1068" fill="#9a9386" font-family="monospace" font-size="26">ACTIVE STEPS ${density} · MAKE SOUND · MAKE MARKET</text>
 </svg>`;
 
   return new Blob([svg], { type: "image/svg+xml" });

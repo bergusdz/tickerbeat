@@ -9,19 +9,21 @@ export async function ReleaseBoard() {
     <section id="board" className={styles.board}>
       <header>
         <div>
-          <span>LIVE ON BASE / CLANKER V4</span>
-          <h2>THE SOUND BOARD</h2>
+          <span>Confirmed on Base</span>
+          <h2>Sound board</h2>
         </div>
-        <p>Listen before you trade. Every card resolves to a real Base token and its immutable audio.</p>
+        <p>Listen first. Every card is a verified token with its immutable audio attached.</p>
       </header>
 
       {items.length === 0 ? (
         <div className={styles.empty}>
-          <span>NO. 000</span>
-          <strong>THE FIRST SLOT IS OPEN.</strong>
-          <p>Open Make to compose it. The board fills only after a confirmed Base deployment.</p>
+          <span>Empty crate</span>
+          <strong>The first slot is open.</strong>
+          <p>Open Make, write a loop, and finish it. The board fills only after a confirmed Base deployment.</p>
         </div>
-      ) : <ReleaseGrid items={items} />}
+      ) : (
+        <ReleaseGrid items={items} />
+      )}
     </section>
   );
 }

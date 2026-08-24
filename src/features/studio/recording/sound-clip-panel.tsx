@@ -38,8 +38,8 @@ export function SoundClipPanel({ control }: { control: SoundClipController }) {
   return (
     <section className={styles.clipPanel} aria-label="Sound recorder and sample import">
       <div className={styles.clipHeading}>
-        <span>OPTIONAL AUDIO</span>
-        <strong>{control.isRecording ? "RECORDING" : control.clip ? "CLIP READY" : "EMPTY"}</strong>
+        <span>Sample clip</span>
+        <strong>{control.isRecording ? "Recording" : control.clip ? "Clip ready" : "Empty"}</strong>
       </div>
 
       {control.clip ? (

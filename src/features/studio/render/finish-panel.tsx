@@ -89,15 +89,15 @@ export function FinishPanel({
     <section className={styles.finishPanel} aria-label="Finish track">
       <div className={styles.finishPanelHeader}>
         <div>
-          <span>04 / MASTER</span>
-          <h2>FINISH THE SOUND</h2>
+          <span>Name it, then render the master</span>
+          <h2>Finish the sound</h2>
         </div>
-        <p>Render the canonical loop before any wallet or market action.</p>
+        <p>The WAV is the artifact. Wallet and market actions stay locked until this render exists.</p>
       </div>
 
       <div className={styles.finishFields}>
         <label>
-          <span>TRACK TITLE</span>
+          <span>Track title</span>
           <input
             aria-label="Track title"
             maxLength={80}
@@ -113,7 +113,7 @@ export function FinishPanel({
           />
         </label>
         <label>
-          <span>FUTURE TICKER</span>
+          <span>Future ticker</span>
           <input
             aria-label="Token ticker"
             maxLength={10}
@@ -155,9 +155,9 @@ export function FinishPanel({
       ) : null}
 
       <div className={styles.launchGate}>
-        <span>BASE LAUNCH</span>
-        <strong>{currentArtifact ? "ARTIFACT VERIFIED LOCALLY" : "WAITING FOR MASTER"}</strong>
-        <small>IPFS publication happens before any wallet or market action.</small>
+        <span>Release gate</span>
+        <strong>{currentArtifact ? "Master ready locally" : "Waiting for a rendered master"}</strong>
+        <small>Publish the WAV, cover and project to IPFS before any wallet action.</small>
       </div>
 
       {currentArtifact ? (

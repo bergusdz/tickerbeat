@@ -1,13 +1,21 @@
 :root {
-  --ink: #070806;
-  --machine: #11130f;
-  --panel: #171a15;
-  --paper: #f4f1e8;
-  --muted: #8d9385;
-  --line: rgba(244, 241, 232, 0.12);
-  --line-strong: #353a30;
-  --acid: #d2ff37;
-  --signal: #ff573d;
+  --void: #070605;
+  --chassis: #12100c;
+  --well: #0c0b09;
+  --raised: #1c1914;
+  --paper: #f3eee4;
+  --muted: #9a9386;
+  --line: rgba(243, 238, 228, 0.1);
+  --line-strong: #3a342c;
+  --signal: #d8ff3c;
+  --playhead: #7ed9ff;
+  --warn: #ff5d3d;
+  --ok: #8dffb0;
+  --base: #0052ff;
+  --touch: 44px;
+  --radius-shell: 22px;
+  --radius-control: 12px;
+  --shadow-shell: 0 28px 80px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.04);
   color-scheme: dark;
 }
 
@@ -16,31 +24,81 @@
 }
 
 html {
-  background: var(--ink);
+  background: var(--void);
   color: var(--paper);
 }
 
 body {
   margin: 0;
   min-height: 100vh;
-  background: var(--ink);
-  font-family: var(--font-mono), monospace;
+  background: var(--void);
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
   text-rendering: optimizeLegibility;
 }
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
-}
-
-button {
   color: inherit;
 }
 
+button {
+  cursor: pointer;
+}
+
 ::selection {
-  background: var(--acid);
-  color: var(--ink);
+  background: var(--signal);
+  color: var(--void);
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: var(--touch);
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: #2b2721;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border: 2px solid var(--void);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--signal);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 4px;
+  border: 0;
+  border-radius: 99px;
+  background: #2b2721;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--void);
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 0 0 1px var(--signal);
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -31,9 +31,9 @@ export function PublishPanel({
 }) {
   return (
     <div className={styles.releaseStage}>
-      <span>01 / IPFS RELEASE</span>
-      <strong>{receipt ? "FILES PINNED" : "PUBLISH THE MASTER"}</strong>
-      <small>WAV, cover, project state, and metadata are content-addressed together.</small>
+      <span>1 · Publish</span>
+      <strong>{receipt ? "Files pinned" : "Publish the master"}</strong>
+      <small>WAV, cover, project state and metadata are content-addressed together.</small>
       {!receipt && !connected ? (
         <div className={styles.walletChoices}>
           {connectors.map((connector) => (

@@ -1,14 +1,13 @@
 .mixStage {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.9fr);
-  gap: 14px;
+  gap: 10px;
 }
 
 .mixer,
 .performance {
-  border: 1px solid #34382f;
-  border-radius: 14px;
-  background: #0b0d0b;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-control);
+  background: var(--well);
 }
 
 .sectionHeading {
@@ -16,112 +15,107 @@
   align-items: end;
   justify-content: space-between;
   gap: 16px;
-  min-height: 64px;
-  padding: 14px 16px;
+  min-height: 56px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--line);
 }
 
 .sectionHeading > div {
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .sectionHeading span,
 .sectionHeading small {
   color: var(--muted);
-  font-size: 0.56rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
 }
 
 .sectionHeading strong {
   font-family: var(--font-display), sans-serif;
-  font-size: clamp(0.95rem, 1.5vw, 1.24rem);
+  font-size: 1.05rem;
   letter-spacing: -0.04em;
 }
 
 .channelStrips {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 8px;
   padding: 12px;
 }
 
 .trackStrip {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
+  gap: 10px;
   padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #10130f;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--raised);
 }
 
 .selectedTrack {
   border-color: var(--track-color);
-  box-shadow: inset 3px 0 var(--track-color);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--track-color) 35%, transparent);
 }
 
 .trackSelect {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  min-height: var(--touch);
   padding: 0;
   border: 0;
   background: transparent;
   color: inherit;
   text-align: left;
-  cursor: pointer;
 }
 
 .trackSelect > span:last-child {
   display: grid;
-  gap: 3px;
+  gap: 2px;
 }
 
 .trackSelect strong {
-  font-size: 0.68rem;
-  text-transform: uppercase;
+  font-size: 0.88rem;
 }
 
 .trackSelect small {
   color: var(--muted);
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
+  font-size: 0.68rem;
 }
 
 .trackLed {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--track-color);
-  box-shadow: 0 0 11px color-mix(in srgb, var(--track-color), transparent 38%);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--track-color), transparent 40%);
 }
 
 .trackButtons {
-  display: flex;
-  gap: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
 }
 
 .trackButtons button {
-  width: 34px;
-  height: 34px;
-  border: 1px solid #40453a;
-  border-radius: 5px;
-  background: #0b0d0a;
+  min-width: var(--touch);
+  min-height: var(--touch);
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--well);
   color: var(--muted);
-  cursor: pointer;
 }
 
 .trackButtons .controlOn {
   border-color: var(--track-color);
   background: var(--track-color);
-  color: #080a07;
+  color: var(--void);
+  font-weight: 600;
 }
 
 .volumeControl {
   display: grid;
-  grid-column: 1 / 3;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 8px;
@@ -130,21 +124,16 @@
 .volumeControl span,
 .volumeControl output {
   color: var(--muted);
-  font-size: 0.52rem;
-  text-transform: uppercase;
+  font-size: 0.68rem;
 }
 
 .volumeControl input {
   min-width: 0;
 }
 
-.performance {
-  padding-bottom: 12px;
-}
-
 .soundControls {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1.4fr 1fr 1fr;
   gap: 10px;
   padding: 12px;
 }
@@ -154,32 +143,26 @@
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   min-height: 72px;
   padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #10130f;
-}
-
-.instrumentControl {
-  grid-column: 1 / 3;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: var(--raised);
 }
 
 .instrumentControl span,
 .effectControl span {
   color: var(--muted);
-  font-size: 0.56rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
 }
 
 .instrumentControl select {
-  min-height: 38px;
-  padding: 0 10px;
+  min-height: var(--touch);
+  padding: 0 12px;
   border: 1px solid var(--track-color);
-  border-radius: 5px;
-  background: #0b0e0a;
+  border-radius: 8px;
+  background: var(--well);
   color: var(--paper);
 }
 
@@ -190,45 +173,43 @@
 
 .effectControl output {
   color: var(--track-color);
-  font-family: var(--font-display), sans-serif;
+  font-family: var(--font-mono), monospace;
 }
 
 .pads {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 7px;
+  gap: 8px;
   padding: 0 12px 12px;
 }
 
 .pads button {
   display: grid;
-  gap: 18px;
-  min-height: 86px;
-  padding: 10px;
-  border: 1px solid #444a3d;
-  border-radius: 9px;
-  background: linear-gradient(145deg, #1b2019, #10130f);
+  align-content: space-between;
+  min-height: 88px;
+  padding: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  background: linear-gradient(160deg, #241f19, #14110e);
   color: var(--paper);
   text-align: left;
-  cursor: pointer;
 }
 
 .pads button:hover,
 .pads button:active {
-  border-color: var(--acid);
-  background: var(--acid);
-  color: #070906;
+  border-color: var(--signal);
+  background: var(--signal);
+  color: var(--void);
 }
 
 .pads span {
-  font-size: 0.5rem;
-  letter-spacing: 0.1em;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
 }
 
 .pads strong {
   font-family: var(--font-display), sans-serif;
-  font-size: 0.72rem;
-  text-transform: uppercase;
+  font-size: 0.95rem;
 }
 
 .masterPanel {
@@ -236,27 +217,26 @@
   grid-template-columns: auto 1fr;
   align-items: center;
   gap: 14px;
-  margin: 0 12px;
+  margin: 0 12px 12px;
   padding: 12px;
-  border: 1px solid #33382e;
-  border-radius: 9px;
-  background: #080a08;
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+  background: #080706;
 }
 
 .masterPanel > div:first-child {
   display: grid;
-  gap: 4px;
+  gap: 2px;
 }
 
 .masterPanel span,
 .masterPanel small {
-  font-size: 0.54rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-size: 0.72rem;
 }
 
 .masterPanel small {
   color: var(--muted);
+  font-family: var(--font-mono), monospace;
 }
 
 .meter {
@@ -266,19 +246,27 @@
 }
 
 .meter i {
-  height: 18px;
+  height: 16px;
   border-radius: 2px;
-  background: #252a22;
+  background: #252018;
 }
 
 .meter .meterOn {
-  background: var(--acid);
-  box-shadow: 0 0 8px rgba(210, 255, 55, 0.35);
+  background: var(--signal);
+  box-shadow: 0 0 8px rgba(216, 255, 60, 0.35);
 }
 
 @media (max-width: 980px) {
-  .mixStage {
-    grid-template-columns: 1fr;
+  .channelStrips {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .soundControls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .instrumentControl {
+    grid-column: 1 / 3;
   }
 }
 
@@ -286,7 +274,7 @@
   .sectionHeading {
     align-items: start;
     flex-direction: column;
-    min-height: 74px;
+    min-height: 64px;
   }
 
   .channelStrips,

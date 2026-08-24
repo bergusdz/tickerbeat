@@ -2,9 +2,14 @@
 
 **Make sound. Make market.**
 
-TickerBeat is a browser DJ desk where a creator builds a short loop, records or
-imports a sound, publishes a reproducible release bundle to IPFS, and launches
-that release as a standard token market on Base through Clanker v4.
+TickerBeat is a browser groovebox. A creator writes a 16-step loop, records or
+imports a sound, publishes a reproducible release bundle to IPFS, and then
+launches that finished artifact as a standard token market on Base through
+Clanker v4.
+
+The interface is staged as Make → Mix → Finish → Board. The first screen is the
+instrument: transport, tracks and the ticker tape. Wallet and market actions
+appear only after a master is rendered.
 
 ## What works
 

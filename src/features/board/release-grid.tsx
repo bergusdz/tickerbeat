@@ -59,9 +59,9 @@ export function ReleaseGrid({ items }: { items: BoardRelease[] }) {
             onEnded={() => markStopped(release.address)}
           />
           <nav>
-            <Link href={`/track/${release.address}`}>LISTEN ↗</Link>
-            <a href={`https://base.app/coin/base-mainnet/${release.address}`} target="_blank" rel="noreferrer">TRADE ↗</a>
-            <a href={`https://basescan.org/token/${release.address}`} target="_blank" rel="noreferrer">VERIFY ↗</a>
+            <Link href={`/track/${release.address}`}>Listen</Link>
+            <a href={`https://base.app/coin/base-mainnet/${release.address}`} target="_blank" rel="noreferrer">Trade</a>
+            <a href={`https://basescan.org/token/${release.address}`} target="_blank" rel="noreferrer">Verify</a>
           </nav>
         </article>
       ))}

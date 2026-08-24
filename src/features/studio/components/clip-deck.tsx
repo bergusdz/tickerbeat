@@ -7,13 +7,12 @@ export function ClipDeck({ control }: { control: SoundClipController }) {
     <section className={styles.clipDeck} aria-label="Recorded sound deck">
       <header className={styles.sectionHeading}>
         <div>
-          <span>Deck B / live input</span>
-          <strong>CAPTURE A SOUND</strong>
+          <span>Optional input</span>
+          <strong>Capture a sound</strong>
         </div>
-        <small>MICROPHONE OR AUDIO FILE</small>
+        <small>Microphone or audio file</small>
       </header>
       <SoundClipPanel control={control} />
     </section>
   );
 }
-
