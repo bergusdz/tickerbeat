@@ -68,7 +68,7 @@ export function Workspace({ panels }: { panels: WorkspacePanels }) {
               aria-selected={selected}
               tabIndex={selected ? 0 : -1}
               className={selected ? styles.activeStage : undefined}
-              onClick={() => setActiveStage(stage.id)}
+              onClick={() => selectStage(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
             >
               <span>{stage.index}</span>

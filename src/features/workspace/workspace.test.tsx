@@ -39,6 +39,16 @@ describe("Workspace", () => {
     expect(screen.getByText("Mixer surface")).toBe(mixContent);
   });
 
+  it("focuses a stage after pointer selection", () => {
+    render(<Workspace panels={panels} />);
+
+    const mix = screen.getByRole("tab", { name: /mix/i });
+    fireEvent.click(mix);
+
+    expect(mix).toHaveFocus();
+    expect(mix).toHaveAttribute("aria-selected", "true");
+  });
+
   it("supports arrow, home and end navigation", () => {
     render(<Workspace panels={panels} />);
 
