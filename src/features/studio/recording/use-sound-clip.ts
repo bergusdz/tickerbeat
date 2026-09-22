@@ -147,10 +147,16 @@ export function useSoundClip(
   }, [replaceClip]);
 
   const clearClip = useCallback(() => {
+    const assetId = clipRef.current?.assetId;
     replaceLoadedClip(null);
     onReferenceChange(null);
     setError(null);
-  }, [onReferenceChange, replaceLoadedClip]);
+    if (assetId) {
+      void store.delete(assetId).catch(() => {
+        setError("The audio clip was removed from the project but could not be cleared from storage.");
+      });
+    }
+  }, [onReferenceChange, replaceLoadedClip, store]);
 
   const setClipSettings = useCallback((patch: Partial<ClipPlaybackSettings>) => {
     setClip((current) => {
