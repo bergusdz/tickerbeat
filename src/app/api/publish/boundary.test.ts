@@ -14,21 +14,30 @@ describe("publication HTTP boundary", () => {
     limiter = new PublicationRateLimiter({ limit: 3, windowMs: 60_000 });
   });
 
-  it("rejects non-multipart requests and declared oversized bodies", () => {
+  it("rejects non-multipart requests and invalid declared body lengths", () => {
     expect(
       validatePublicationRequestHeaders(
         new Headers({ "content-type": "application/json", "content-length": "20" }),
       ),
     ).toEqual({ code: "UNSUPPORTED_MEDIA_TYPE", status: 415 });
 
-    expect(
-      validatePublicationRequestHeaders(
-        new Headers({
-          "content-type": "multipart/form-data; boundary=beat",
-          "content-length": String(MAX_PUBLICATION_REQUEST_BYTES + 1),
-        }),
-      ),
-    ).toEqual({ code: "PAYLOAD_TOO_LARGE", status: 413 });
+    for (const contentLength of [
+      String(MAX_PUBLICATION_REQUEST_BYTES + 1),
+      "-1",
+      "1.5",
+      "  ",
+      "+1",
+      "1e2",
+    ]) {
+      expect(
+        validatePublicationRequestHeaders(
+          new Headers({
+            "content-type": "multipart/form-data; boundary=beat",
+            "content-length": contentLength,
+          }),
+        ),
+      ).toEqual({ code: "PAYLOAD_TOO_LARGE", status: 413 });
+    }
   });
 
   it("allows a bounded number of requests per client and reports retry time", () => {
@@ -49,4 +58,3 @@ describe("publication HTTP boundary", () => {
     expect(clientIdentifier(new Headers())).toBe("unknown-client");
   });
 });
-
