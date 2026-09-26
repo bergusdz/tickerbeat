@@ -15,9 +15,13 @@ export function validatePublicationRequestHeaders(headers: Headers): HeaderFailu
   }
 
   const rawLength = headers.get("content-length");
-  if (rawLength) {
+  if (rawLength !== null) {
     const contentLength = Number(rawLength);
-    if (!Number.isFinite(contentLength) || contentLength > MAX_PUBLICATION_REQUEST_BYTES) {
+    if (
+      !/^\d+$/.test(rawLength) ||
+      !Number.isSafeInteger(contentLength) ||
+      contentLength > MAX_PUBLICATION_REQUEST_BYTES
+    ) {
       return { code: "PAYLOAD_TOO_LARGE", status: 413 };
     }
   }
