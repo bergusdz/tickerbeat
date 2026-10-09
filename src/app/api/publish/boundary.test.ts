@@ -21,14 +21,30 @@ describe("publication HTTP boundary", () => {
       ),
     ).toEqual({ code: "UNSUPPORTED_MEDIA_TYPE", status: 415 });
 
+    for (const contentType of [
+      "multipart/form-data",
+      "multipart/form-data; charset=utf-8",
+      "multipart/form-data; boundary=",
+    ]) {
+      expect(
+        validatePublicationRequestHeaders(new Headers({ "content-type": contentType })),
+      ).toEqual({ code: "UNSUPPORTED_MEDIA_TYPE", status: 415 });
+    }
+
     expect(
       validatePublicationRequestHeaders(
         new Headers({
-          "content-type": "multipart/form-data; boundary=beat",
+          "content-type": "multipart/form-data; charset=utf-8; boundary=beat",
           "content-length": String(MAX_PUBLICATION_REQUEST_BYTES + 1),
         }),
       ),
     ).toEqual({ code: "PAYLOAD_TOO_LARGE", status: 413 });
+
+    expect(
+      validatePublicationRequestHeaders(
+        new Headers({ "content-type": "multipart/form-data; boundary=beat" }),
+      ),
+    ).toBeNull();
   });
 
   it("allows a bounded number of requests per client and reports retry time", () => {

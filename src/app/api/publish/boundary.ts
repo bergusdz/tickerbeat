@@ -10,7 +10,12 @@ type HeaderFailure = {
 
 export function validatePublicationRequestHeaders(headers: Headers): HeaderFailure | null {
   const contentType = headers.get("content-type")?.toLowerCase() ?? "";
-  if (!contentType.startsWith("multipart/form-data;")) {
+  const [mediaType, ...parameters] = contentType.split(";");
+  const hasBoundary = parameters.some((parameter) => {
+    const [name, ...valueParts] = parameter.split("=");
+    return name?.trim() === "boundary" && valueParts.join("=").trim().length > 0;
+  });
+  if (mediaType?.trim() !== "multipart/form-data" || !hasBoundary) {
     return { code: "UNSUPPORTED_MEDIA_TYPE", status: 415 };
   }
 
